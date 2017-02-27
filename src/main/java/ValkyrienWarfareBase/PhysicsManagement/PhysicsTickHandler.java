@@ -4,8 +4,7 @@ import java.util.ArrayList;
 
 import ValkyrienWarfareBase.ValkyrienWarfareMod;
 import ValkyrienWarfareBase.API.Vector;
-import ValkyrienWarfareBase.CoreMod.EntityDraggable;
-import net.minecraft.entity.Entity;
+import ValkyrienWarfareBase.EntityMultiWorldFixes.EntityDraggable;
 import net.minecraft.world.World;
 
 public class PhysicsTickHandler {
@@ -20,8 +19,12 @@ public class PhysicsTickHandler {
 			manager.onUnload(wrapper);
 		}
 
-		// Do this to prevent a ConcurrentModificationException from other threads spawning entities (ChunkLoading thread does this)
-		ArrayList<PhysicsWrapperEntity> physicsEntities = (ArrayList<PhysicsWrapperEntity>) manager.physicsEntities.clone();
+
+		
+		ArrayList<PhysicsWrapperEntity> physicsEntities = manager.getTickablePhysicsEntities();
+		
+//		System.out.println(physicsEntities.size());
+		
 		if (!ValkyrienWarfareMod.doSplitting) {
 			for (PhysicsWrapperEntity wrapper : physicsEntities) {
 				wrapper.wrapping.coordTransform.setPrevMatrices();
@@ -33,9 +36,10 @@ public class PhysicsTickHandler {
 			 * boolean didSplitOccur = false; for(PhysicsWrapperEntity wrapper:physicsEntities){ if(wrapper.wrapping.processPotentialSplitting()){ didSplitOccur = true; } } if(didSplitOccur){ while(didSplitOccur){ didSplitOccur = false; ArrayList oldPhysicsEntities = physicsEntities; ArrayList<PhysicsWrapperEntity> newPhysicsEntities = (ArrayList<PhysicsWrapperEntity>) manager.physicsEntities.clone(); newPhysicsEntities.removeAll(oldPhysicsEntities); if(newPhysicsEntities.size()!=0){ for(PhysicsWrapperEntity wrapper:newPhysicsEntities){ if(wrapper.wrapping.processPotentialSplitting()){ didSplitOccur = true; } } } } physicsEntities = (ArrayList<PhysicsWrapperEntity>) manager.physicsEntities.clone(); } for(PhysicsWrapperEntity wrapper:physicsEntities){ wrapper.wrapping.coordTransform.setPrevMatrices(); wrapper.wrapping.updateChunkCache(); // Collections.shuffle(wrapper.wrapping.physicsProcessor.activeForcePositions); }
 			 */
 		}
-
-		// System.out.println(physicsEntities.size());
-
+		if(!world.isRemote && world.provider.isSurfaceWorld()){
+//			System.out.println(physicsEntities.size());
+		}
+			
 		int iters = ValkyrienWarfareMod.physIter;
 		double newPhysSpeed = ValkyrienWarfareMod.physSpeed;
 		Vector newGravity = ValkyrienWarfareMod.gravity;
@@ -87,7 +91,7 @@ public class PhysicsTickHandler {
 
 	public static void onWorldTickEnd(World world) {
 		WorldPhysObjectManager manager = ValkyrienWarfareMod.physicsManager.getManagerForWorld(world);
-		ArrayList<PhysicsWrapperEntity> physicsEntities = (ArrayList<PhysicsWrapperEntity>) manager.physicsEntities.clone();
+		ArrayList<PhysicsWrapperEntity> physicsEntities = manager.getTickablePhysicsEntities();
 		for (PhysicsWrapperEntity wrapperEnt : physicsEntities) {
 			wrapperEnt.wrapping.onPostTick();
 		}

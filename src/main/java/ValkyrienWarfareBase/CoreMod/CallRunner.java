@@ -1,7 +1,6 @@
 package ValkyrienWarfareBase.CoreMod;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -19,19 +18,13 @@ import ValkyrienWarfareBase.Physics.BlockMass;
 import ValkyrienWarfareBase.Physics.PhysicsQueuedForce;
 import ValkyrienWarfareBase.PhysicsManagement.PhysicsWrapperEntity;
 import ValkyrienWarfareBase.PhysicsManagement.WorldPhysObjectManager;
-import ValkyrienWarfareCombat.Entity.EntityMountingWeaponBase;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.item.EntityArmorStand;
-import net.minecraft.entity.item.EntityBoat;
-import net.minecraft.entity.item.EntityFallingBlock;
-import net.minecraft.entity.passive.EntityPig;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.inventory.Container;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.SPacketEffect;
@@ -49,11 +42,26 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.gen.ChunkProviderServer;
 import net.minecraftforge.common.DimensionManager;
 
 public class CallRunner {
 
+    public static void onAddEntity(Chunk chunk, Entity entityIn){
+    	World world = chunk.worldObj;
+    	
+    	int i = MathHelper.floor_double(entityIn.posX / 16.0D);
+        int j = MathHelper.floor_double(entityIn.posZ / 16.0D);
+    	
+        if(i == chunk.xPosition && j == chunk.zPosition){
+        	chunk.addEntity(entityIn);
+        }else{
+        	Chunk realChunkFor = world.getChunkFromChunkCoords(i, j);
+        	if(!realChunkFor.isEmpty() && realChunkFor.isChunkLoaded){
+        		realChunkFor.addEntity(entityIn);
+        	}
+        }
+    }
+	
 	public static BlockPos onGetPrecipitationHeight(World world, BlockPos posToCheck) {
 		BlockPos pos = world.getPrecipitationHeight(posToCheck);
 		if(!world.isRemote || ValkyrienWarfareMod.accurateRain){
@@ -61,11 +69,6 @@ public class CallRunner {
 		}else{
 			return CallRunnerClient.onGetPrecipitationHeightClient(world, posToCheck);
 		}
-	}
-	
-	public static Vec3d onGetLookVec(Entity entity) {
-		// System.out.println("test");
-		return entity.getLookVec();
 	}
 
 	public static boolean onIsOnLadder(EntityLivingBase base) {
@@ -214,7 +217,7 @@ public class CallRunner {
 		PhysicsWrapperEntity wrapper = ValkyrienWarfareMod.physicsManager.getObjectManagingPos(world, pos);
 		if (wrapper != null) {
 			Polygon poly = new Polygon(aabb, wrapper.wrapping.coordTransform.lToWTransform);
-			aabb = poly.getEnclosedAABB().contract(.3D);
+			aabb = poly.getEnclosedAABB();//.contract(.3D);
 		}
 		return world.getEntitiesWithinAABB(clazz, aabb, filter);
 	}
@@ -229,23 +232,23 @@ public class CallRunner {
 		return world.getEntitiesInAABBexcluding(entityIn, boundingBox, predicate);
 	}
 
-	public static Iterator<Chunk> onGetPersistentChunkIterable(World world, Iterator<Chunk> chunkIterator) {
-		Iterator<Chunk> vanillaResult = world.getPersistentChunkIterable(chunkIterator);
-		ArrayList<Chunk> newResultArray = new ArrayList<Chunk>();
-		while (vanillaResult.hasNext()) {
-			newResultArray.add(vanillaResult.next());
-		}
-		WorldPhysObjectManager manager = ValkyrienWarfareMod.physicsManager.getManagerForWorld(world);
-		ArrayList<PhysicsWrapperEntity> physEntities = (ArrayList<PhysicsWrapperEntity>) manager.physicsEntities.clone();
-		for (PhysicsWrapperEntity wrapper : physEntities) {
-			for (Chunk[] chunkArray : wrapper.wrapping.claimedChunks) {
-				for (Chunk chunk : chunkArray) {
-					newResultArray.add(chunk);
-				}
-			}
-		}
-		return newResultArray.iterator();
-	}
+//	public static Iterator<Chunk> onGetPersistentChunkIterable(World world, Iterator<Chunk> chunkIterator) {
+//		Iterator<Chunk> vanillaResult = world.getPersistentChunkIterable(chunkIterator);
+//		ArrayList<Chunk> newResultArray = new ArrayList<Chunk>();
+//		while (vanillaResult.hasNext()) {
+//			newResultArray.add(vanillaResult.next());
+//		}
+//		WorldPhysObjectManager manager = ValkyrienWarfareMod.physicsManager.getManagerForWorld(world);
+//		ArrayList<PhysicsWrapperEntity> physEntities = (ArrayList<PhysicsWrapperEntity>) manager.physicsEntities.clone();
+//		for (PhysicsWrapperEntity wrapper : physEntities) {
+//			for (Chunk[] chunkArray : wrapper.wrapping.claimedChunks) {
+//				for (Chunk chunk : chunkArray) {
+//					newResultArray.add(chunk);
+//				}
+//			}
+//		}
+//		return newResultArray.iterator();
+//	}
 
 	public static boolean onCanInteractWith(Container con, EntityPlayer player) {
 		boolean vanilla = con.canInteractWith(player);
@@ -316,7 +319,7 @@ public class CallRunner {
 		return ent.getDistanceSq(x, y, z);
 	}
 
-	public static boolean onSpawnEntityInWorld(World world, Entity entity) {
+/*	public static boolean onSpawnEntityInWorld(World world, Entity entity) {
 		BlockPos posAt = new BlockPos(entity);
 		PhysicsWrapperEntity wrapper = ValkyrienWarfareMod.physicsManager.getObjectManagingPos(world, posAt);
 		if (!(entity instanceof EntityFallingBlock) && wrapper != null && wrapper.wrapping.coordTransform != null) {
@@ -328,7 +331,7 @@ public class CallRunner {
 			RotationMatrices.applyTransform(wrapper.wrapping.coordTransform.lToWTransform, wrapper.wrapping.coordTransform.lToWRotation, entity);
 		}
 		return world.spawnEntityInWorld(entity);
-	}
+	}*/
 
 	public static void onSendToAllNearExcept(PlayerList list, @Nullable EntityPlayer except, double x, double y, double z, double radius, int dimension, Packet<?> packetIn) {
 		BlockPos pos = new BlockPos(x, y, z);
@@ -384,7 +387,24 @@ public class CallRunner {
 		}
 	}
 
-	public static boolean onSetBlockState(World world, BlockPos pos, IBlockState newState, int flags) {
+	public static IBlockState onSetBlockState(Chunk chunkFor, BlockPos pos, IBlockState newState)
+    {
+		World world = chunkFor.worldObj;
+		IBlockState oldState = chunkFor.getBlockState(pos);
+		PhysicsWrapperEntity wrapper = ValkyrienWarfareMod.physicsManager.getObjectManagingPos(world, pos);
+		if (wrapper != null) {
+			if(!world.isRemote){
+				wrapper.wrapping.pilotingController.onSetBlockInShip(pos, newState);
+			}
+			wrapper.wrapping.onSetBlockState(oldState, newState, pos);
+			if (world.isRemote) {
+				wrapper.wrapping.renderer.markForUpdate();
+			}
+		}
+		return chunkFor.setBlockState(pos, newState);
+    }
+	
+	/*public static boolean onSetBlockState(World world, BlockPos pos, IBlockState newState, int flags) {
 		IBlockState oldState = world.getBlockState(pos);
 		boolean toReturn = world.setBlockState(pos, newState, flags);
 		PhysicsWrapperEntity wrapper = ValkyrienWarfareMod.physicsManager.getObjectManagingPos(world, pos);
@@ -398,7 +418,7 @@ public class CallRunner {
 			}
 		}
 		return toReturn;
-	}
+	}*/
 
 	public static RayTraceResult onRayTraceBlocks(World world, Vec3d vec31, Vec3d vec32, boolean stopOnLiquid, boolean ignoreBlockWithoutBoundingBox, boolean returnLastUncollidableBlock) {
 		RayTraceResult vanillaTrace = world.rayTraceBlocks(vec31, vec32, stopOnLiquid, ignoreBlockWithoutBoundingBox, returnLastUncollidableBlock);
@@ -445,80 +465,6 @@ public class CallRunner {
 	}
 
 	public static void onEntityMove(Entity entity, double dx, double dy, double dz) {
-		EntityDraggable draggable = EntityDraggable.getDraggableFromEntity(entity);
-		
-		PhysicsWrapperEntity worldBelowFeet = draggable.worldBelowFeet;
-		
-		if(worldBelowFeet != null && false){
-			float rotYaw = entity.rotationYaw;
-			float rotPitch = entity.rotationPitch;
-			float prevYaw = entity.prevRotationYaw;
-			float prevPitch = entity.prevRotationPitch;
-	
-			Vector posWithShipVel = new Vector(entity);
-			
-			RotationMatrices.applyTransform(worldBelowFeet.wrapping.coordTransform.prevwToLTransform, posWithShipVel);
-			RotationMatrices.applyTransform(worldBelowFeet.wrapping.coordTransform.lToWTransform, posWithShipVel);
-			
-			Vector newVelocityFromShip = posWithShipVel.getSubtraction(new Vector(entity));
-			
-			draggable.velocityAddedToPlayer = newVelocityFromShip;
-			
-			RotationMatrices.applyTransform(worldBelowFeet.wrapping.coordTransform.prevwToLTransform, worldBelowFeet.wrapping.coordTransform.prevWToLRotation, entity);
-			RotationMatrices.applyTransform(worldBelowFeet.wrapping.coordTransform.lToWTransform, worldBelowFeet.wrapping.coordTransform.lToWRotation, entity);
-	
-			entity.rotationYaw = rotYaw;
-			entity.rotationPitch = rotPitch;
-			entity.prevRotationYaw = prevYaw;
-			entity.prevRotationPitch = prevPitch;
-	
-			Vector oldLookingPos = new Vector(entity.getLook(1.0F));
-			RotationMatrices.applyTransform(worldBelowFeet.wrapping.coordTransform.prevWToLRotation, oldLookingPos);
-			RotationMatrices.applyTransform(worldBelowFeet.wrapping.coordTransform.lToWRotation, oldLookingPos);
-	
-			double newPitch = Math.asin(oldLookingPos.Y) * -180D / Math.PI;
-			double f4 = -Math.cos(-newPitch * 0.017453292D);
-			double radianYaw = Math.atan2((oldLookingPos.X / f4), (oldLookingPos.Z / f4));
-			radianYaw += Math.PI;
-			radianYaw *= -180D / Math.PI;
-			if (!(Double.isNaN(radianYaw) || Math.abs(newPitch) > 85)) {
-				double wrappedYaw = MathHelper.wrapDegrees(radianYaw);
-				double wrappedRotYaw = MathHelper.wrapDegrees(entity.rotationYaw);
-				double yawDif = wrappedYaw - wrappedRotYaw;
-				if (Math.abs(yawDif) > 180D) {
-					if (yawDif < 0) {
-						yawDif += 360D;
-					} else {
-						yawDif -= 360D;
-					}
-				}
-				yawDif %= 360D;
-				final double threshold = .1D;
-				if (Math.abs(yawDif) < threshold) {
-					yawDif = 0D;
-				}
-				if (!(entity instanceof EntityPlayer)) {
-					if (entity instanceof EntityArrow) {
-						entity.prevRotationYaw = entity.rotationYaw;
-						entity.rotationYaw -= yawDif;
-					} else {
-						entity.prevRotationYaw = entity.rotationYaw;
-						entity.rotationYaw += yawDif;
-					}
-				} else {
-					if (entity.worldObj.isRemote) {
-						entity.prevRotationYaw = entity.rotationYaw;
-						entity.rotationYaw += yawDif;
-					}
-				}
-			}
-		
-		}
-		
-//		dx += draggable.velocityAddedToPlayer.X;
-//		dy += draggable.velocityAddedToPlayer.Y;
-//		dz += draggable.velocityAddedToPlayer.Z;
-		
 		if (!EntityCollisionInjector.alterEntityMovement(entity, dx, dy, dz)) {
 			entity.moveEntity(dx, dy, dz);
 		}
@@ -532,39 +478,23 @@ public class CallRunner {
 	}
 
 	public static void onEntityAdded(World world, Entity added) {
-		if (added instanceof PhysicsWrapperEntity) {
-			ValkyrienWarfareMod.physicsManager.onShipLoad((PhysicsWrapperEntity) added);
-		}
+//		if (added instanceof PhysicsWrapperEntity) {
+//			ValkyrienWarfareMod.physicsManager.onShipLoad((PhysicsWrapperEntity) added);
+//		}
 		world.onEntityAdded(added);
 	}
 
-	public static void onChunkUnload(ChunkProviderServer provider, Chunk chunk) {
-		if (!ValkyrienWarfareMod.chunkManager.isChunkInShipRange(provider.worldObj, chunk.xPosition, chunk.zPosition)) {
-			if (!chunk.worldObj.isSpawnChunk(chunk.xPosition, chunk.zPosition)) {
-				for (int i = 0; i < chunk.entityLists.length; ++i) {
-					Collection<Entity> c = chunk.entityLists[i];
-					for (Entity entity : c) {
-						if (entity instanceof PhysicsWrapperEntity) {
-							ValkyrienWarfareMod.physicsManager.getManagerForWorld(entity.worldObj).physicsEntitiesToUnload.add((PhysicsWrapperEntity) entity);
-						}
-					}
-				}
-			}
-			provider.unload(chunk);
-		}
-	}
-	
     public static Vec3d onGetLook(Entity entityFor, float partialTicks){
-    	Vec3d defualtOutput = entityFor.getLook(partialTicks);
+    	Vec3d defaultOutput = entityFor.getLook(partialTicks);
     	
     	PhysicsWrapperEntity wrapper = ValkyrienWarfareMod.physicsManager.getShipFixedOnto(entityFor);
 		if(wrapper != null){
-			Vector newOutput = new Vector(defualtOutput);
+			Vector newOutput = new Vector(defaultOutput);
 			RotationMatrices.applyTransform(wrapper.wrapping.coordTransform.RlToWRotation, newOutput);
 			return newOutput.toVec3d();
 		}
     	
-    	return defualtOutput;
+    	return defaultOutput;
     }
 
 }

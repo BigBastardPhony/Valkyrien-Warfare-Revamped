@@ -415,7 +415,7 @@ public class CallRunnerClient extends CallRunner {
 					double d1 = wrapper.wrapping.renderer.offsetPos.getY();
 					double d2 = wrapper.wrapping.renderer.offsetPos.getZ();
 					AxisAlignedBB toRender = iblockstate.getSelectedBoundingBox(renderGlobal.theWorld, blockpos).expandXyz(0.0020000000949949026D).offset(-d0, -d1, -d2);
-					renderGlobal.func_189697_a(toRender, 0, 0, 0, 0.4f);
+					renderGlobal.drawSelectionBoundingBox(toRender, 0, 0, 0, 0.4f);
 				}
 			}
 			GL11.glPopMatrix();
@@ -470,7 +470,7 @@ public class CallRunnerClient extends CallRunner {
 		int j = pos.getY();
 		int k = pos.getZ();
 		client.invalidateBlockReceiveRegion(i, j, k, i, j, k);
-		return CallRunner.onSetBlockState(client, pos, state, 3);
+		return client.setBlockState(pos, state, 3);
 	}
 
 	public static int onRenderBlockLayer(RenderGlobal renderer, BlockRenderLayer blockLayerIn, double partialTicks, int pass, Entity entityIn) {

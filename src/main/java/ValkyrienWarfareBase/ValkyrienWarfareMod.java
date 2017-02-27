@@ -98,6 +98,8 @@ public class ValkyrienWarfareMod {
 	public static int maxAirships = -1;
 	public static boolean highAccuracyCollisions = false;
 	public static boolean accurateRain = false;
+	
+	public static boolean runAirshipPermissions = false;
 
 	// NOTE: These only calculate physics, so they are only relevant to the Server end
 	public static ExecutorService MultiThreadExecutor;
@@ -192,8 +194,11 @@ public class ValkyrienWarfareMod {
 		
 		accurateRain = config.get(Configuration.CATEGORY_GENERAL, "Enables accurate rain on ships", false, "Debug feature, takes a lot of processing power").getBoolean();
 		
+		runAirshipPermissions = config.get(Configuration.CATEGORY_GENERAL, "Enables the airship permissions system", false, "Enables the airship permissions system").getBoolean();
+		
 		if (MultiThreadExecutor != null) {
 			MultiThreadExecutor.shutdown();
+			MultiThreadExecutor = null;
 		}
 		if (multiThreadedPhysics) {
 			MultiThreadExecutor = Executors.newFixedThreadPool(threadCount);

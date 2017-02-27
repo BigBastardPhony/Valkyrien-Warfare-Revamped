@@ -63,6 +63,16 @@ public class TransformAdapter extends ClassVisitor {
 	}
 
 	public boolean runTransformer(String calledName, String calledDesc, String calledOwner, MethodVisitor mv) {
+		if (isMethod(calledDesc, "(L"+EntityClassName+";)V", calledName, ChunkName, "addEntity", "func_76612_a", calledOwner)) {
+			mv.visitMethodInsn(Opcodes.INVOKESTATIC, ValkyrienWarfarePlugin.PathCommon, "onAddEntity", String.format("(L%s;L"+EntityClassName+";)V", ChunkName));
+			return false;
+		}
+		
+		if (isMethod(calledDesc, "(L"+BlockPosName+";L"+IBlockStateName+";)L"+IBlockStateName+";", calledName, ChunkName, "setBlockState", "func_177436_a", calledOwner)) {
+			mv.visitMethodInsn(Opcodes.INVOKESTATIC, ValkyrienWarfarePlugin.PathCommon, "onSetBlockState", String.format("(L%s;L"+BlockPosName+";L"+IBlockStateName+";)L"+IBlockStateName+";", ChunkName));
+			return false;
+		}
+		
 		if (isMethod(calledDesc, "(F)L" + Vec3dName + ";", calledName, EntityClassName, "getPositionEyes", "func_174824_e", calledOwner)) {
 			mv.visitMethodInsn(Opcodes.INVOKESTATIC, ValkyrienWarfarePlugin.PathClient, "onGetPositionEyes", String.format("(L%s;F)L"+Vec3dName+";", EntityClassName));
 			return false;
@@ -83,10 +93,10 @@ public class TransformAdapter extends ClassVisitor {
 			return false;
 		}
 
-		if (isMethod(calledDesc, "()L" + Vec3dName + ";", calledName, EntityClassName, "getLookVec", "RENAMEME", calledOwner)) {
-			mv.visitMethodInsn(Opcodes.INVOKESTATIC, ValkyrienWarfarePlugin.PathCommon, "onGetLookVec", String.format("(L%s;)L" + Vec3dName + ";", EntityClassName));
-			return false;
-		}
+//		if (isMethod(calledDesc, "()L" + Vec3dName + ";", calledName, EntityClassName, "getLookVec", "RENAMEME", calledOwner)) {
+//			mv.visitMethodInsn(Opcodes.INVOKESTATIC, ValkyrienWarfarePlugin.PathCommon, "onGetLookVec", String.format("(L%s;)L" + Vec3dName + ";", EntityClassName));
+//			return false;
+//		}
 
 		if (isMethod(calledDesc, "(F)V", calledName, EntityRendererName, "orientCamera", "func_78467_g", calledOwner)) {
 			mv.visitMethodInsn(Opcodes.INVOKESTATIC, ValkyrienWarfarePlugin.PathClient, "onOrientCamera", String.format("(L%s;F)V", EntityRendererName));
@@ -128,10 +138,10 @@ public class TransformAdapter extends ClassVisitor {
 			return false;
 		}
 
-		if (isMethod(calledDesc, "(L" + IteratorName + ";)L" + IteratorName + ";", calledName, WorldClassName, "getPersistentChunkIterable", "getPersistentChunkIterable", calledOwner)) {
-			mv.visitMethodInsn(Opcodes.INVOKESTATIC, ValkyrienWarfarePlugin.PathCommon, "onGetPersistentChunkIterable", String.format("(L%s;L" + IteratorName + ";)L" + IteratorName + ";", WorldClassName));
-			return false;
-		}
+//		if (isMethod(calledDesc, "(L" + IteratorName + ";)L" + IteratorName + ";", calledName, WorldClassName, "getPersistentChunkIterable", "getPersistentChunkIterable", calledOwner)) {
+//			mv.visitMethodInsn(Opcodes.INVOKESTATIC, ValkyrienWarfarePlugin.PathCommon, "onGetPersistentChunkIterable", String.format("(L%s;L" + IteratorName + ";)L" + IteratorName + ";", WorldClassName));
+//			return false;
+//		}
 
 		if (isMethod(calledDesc, "(L" + EntityPlayerName + ";)Z", calledName, ContainerName, "canInteractWith", "func_75145_c", calledOwner)) {
 			mv.visitMethodInsn(Opcodes.INVOKESTATIC, ValkyrienWarfarePlugin.PathCommon, "onCanInteractWith", String.format("(L%s;L" + EntityPlayerName + ";)Z", ContainerName));
@@ -178,10 +188,10 @@ public class TransformAdapter extends ClassVisitor {
 			return false;
 		}
 
-		if (isMethod(calledDesc, "(L" + EntityClassName + ";)Z", calledName, WorldClassName, "spawnEntityInWorld", "func_72838_d", calledOwner)) {
-			mv.visitMethodInsn(Opcodes.INVOKESTATIC, ValkyrienWarfarePlugin.PathClient, "onSpawnEntityInWorld", String.format("(L%s;L" + EntityClassName + ";)Z", WorldClassName));
-			return false;
-		}
+//		if (isMethod(calledDesc, "(L" + EntityClassName + ";)Z", calledName, WorldClassName, "spawnEntityInWorld", "func_72838_d", calledOwner)) {
+//			mv.visitMethodInsn(Opcodes.INVOKESTATIC, ValkyrienWarfarePlugin.PathClient, "onSpawnEntityInWorld", String.format("(L%s;L" + EntityClassName + ";)Z", WorldClassName));
+//			return false;
+//		}
 
 		if (isMethod(calledDesc, "(L" + BlockPosName + ";L" + IBlockStateName + ";)Z", calledName, WorldClientName, "invalidateRegionAndSetBlock", "func_180503_b", calledOwner)) {
 			mv.visitMethodInsn(Opcodes.INVOKESTATIC, ValkyrienWarfarePlugin.PathClient, "onInvalidateRegionAndSetBlock", String.format("(L%s;L" + BlockPosName + ";L" + IBlockStateName + ";)Z", WorldClientName));
@@ -193,10 +203,11 @@ public class TransformAdapter extends ClassVisitor {
 			return false;
 		}
 
-		if (isMethod(calledDesc, "(L" + BlockPosName + ";L" + IBlockStateName + ";I)Z", calledName, WorldClassName, "setBlockState", "func_180501_a", calledOwner)) {
-			mv.visitMethodInsn(Opcodes.INVOKESTATIC, ValkyrienWarfarePlugin.PathCommon, "onSetBlockState", String.format("(L%s;L" + BlockPosName + ";L" + IBlockStateName + ";I)Z", WorldClassName));
-			return false;
-		}
+//		SpongeFix #1
+//		if (isMethod(calledDesc, "(L" + BlockPosName + ";L" + IBlockStateName + ";I)Z", calledName, WorldClassName, "setBlockState", "func_180501_a", calledOwner)) {
+//			mv.visitMethodInsn(Opcodes.INVOKESTATIC, ValkyrienWarfarePlugin.PathCommon, "onSetBlockState", String.format("(L%s;L" + BlockPosName + ";L" + IBlockStateName + ";I)Z", WorldClassName));
+//			return false;
+//		}
 
 		if (isMethod(calledDesc, "(L" + Vec3dName + ";L" + Vec3dName + ";ZZZ)L" + RayTraceResultName + ";", calledName, WorldClassName, "rayTraceBlocks", "func_147447_a", calledOwner)) {
 			mv.visitMethodInsn(Opcodes.INVOKESTATIC, ValkyrienWarfarePlugin.PathCommon, "onRayTraceBlocks", String.format("(L%s;L" + Vec3dName + ";L" + Vec3dName + ";ZZZ)L" + RayTraceResultName + ";", WorldClassName));
@@ -218,10 +229,10 @@ public class TransformAdapter extends ClassVisitor {
 			return false;
 		}
 
-		if (isMethod(calledDesc, "(L" + ChunkName + ";)V", calledName, ChunkProviderServerName, "unload", "func_189549_a", calledOwner)) {
-			mv.visitMethodInsn(Opcodes.INVOKESTATIC, ValkyrienWarfarePlugin.PathCommon, "onChunkUnload", String.format("(L%s;L" + ChunkName + ";)V", ChunkProviderServerName));
-			return false;
-		}
+//		if (isMethod(calledDesc, "(L" + ChunkName + ";)V", calledName, ChunkProviderServerName, "unload", "func_189549_a", calledOwner)) {
+//			mv.visitMethodInsn(Opcodes.INVOKESTATIC, ValkyrienWarfarePlugin.PathCommon, "onChunkUnload", String.format("(L%s;L" + ChunkName + ";)V", ChunkProviderServerName));
+//			return false;
+//		}
 
 		return true;
 	}
@@ -303,7 +314,7 @@ public class TransformAdapter extends ClassVisitor {
 		MethodVisitor toReturn = new MethodVisitor(api, cv.visitMethod(access, methodName, methodDesc, signature, exceptions)) {
 			@Override
 			public void visitMethodInsn(int opcode, String calledOwner, String calledName, String calledDesc) {
-				if (opcode == Opcodes.INVOKEVIRTUAL) {
+				if (opcode == Opcodes.INVOKEVIRTUAL || opcode == Opcodes.INVOKEINTERFACE) {
 					if (runTransformer(calledName, calledDesc, calledOwner, mv)) {
 						super.visitMethodInsn(opcode, calledOwner, calledName, calledDesc);
 					}
