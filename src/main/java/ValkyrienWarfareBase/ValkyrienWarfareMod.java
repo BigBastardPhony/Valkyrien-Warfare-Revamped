@@ -98,7 +98,7 @@ public class ValkyrienWarfareMod {
 	public static int maxAirships = -1;
 	public static boolean highAccuracyCollisions = false;
 	public static boolean accurateRain = false;
-	
+
 	public static boolean runAirshipPermissions = false;
 
 	// NOTE: These only calculate physics, so they are only relevant to the Server end
@@ -106,7 +106,7 @@ public class ValkyrienWarfareMod {
 
 	public DataTag tag = null;
 	public static Logger VWLogger;
-	
+
 	@CapabilityInject(IAirshipCounterCapability.class)
 	public static final Capability<IAirshipCounterCapability> airshipCounter = null;
 
@@ -136,6 +136,7 @@ public class ValkyrienWarfareMod {
 		airStateIndex = Block.getStateId(Blocks.AIR.getDefaultState());
 		BlockPhysicsRegistration.registerCustomBlockMasses();
 		BlockPhysicsRegistration.registerVanillaBlockForces();
+		BlockPhysicsRegistration.registerBlocksToNotPhysicise();
 	}
 
 	@EventHandler
@@ -191,11 +192,11 @@ public class ValkyrienWarfareMod {
 		maxAirships = config.get(Configuration.CATEGORY_GENERAL, "Max airships per player", -1, "Players can't own more than this many airships at once. Set to -1 to disable.").getInt();
 
 		highAccuracyCollisions = config.get(Configuration.CATEGORY_GENERAL, "Enables higher collision accuracy", false, "Debug feature, takes an insane amount of processing power").getBoolean();
-		
+
 		accurateRain = config.get(Configuration.CATEGORY_GENERAL, "Enables accurate rain on ships", false, "Debug feature, takes a lot of processing power").getBoolean();
-		
+
 		runAirshipPermissions = config.get(Configuration.CATEGORY_GENERAL, "Enables the airship permissions system", false, "Enables the airship permissions system").getBoolean();
-		
+
 		if (MultiThreadExecutor != null) {
 			MultiThreadExecutor.shutdown();
 			MultiThreadExecutor = null;
@@ -232,6 +233,7 @@ public class ValkyrienWarfareMod {
 			tag.setDouble("gravityVecZ", 0);
 			tag.setInteger("physicsIterations", 10);
 			tag.setDouble("physicsSpeed", 0.05);
+			tag.setBoolean("doEtheriumLifting", true);
 			tag.save();
 		} else {
 			tag = new DataTag(file);
@@ -247,6 +249,10 @@ public class ValkyrienWarfareMod {
 		ValkyrienWarfareMod.physIter = tag.getInteger("physicsIterations", 8);
 		ValkyrienWarfareMod.physSpeed = tag.getDouble("physicsSpeed", 0.05);
 		ValkyrienWarfareMod.gravity = new Vector(tag.getDouble("gravityVecX", 0.0), tag.getDouble("gravityVecY", -9.8), tag.getDouble("gravityVecZ", 0.0));
+		PhysicsSettings.doEtheriumLifting = tag.getBoolean("doEtheriumLifting", true);
+
+		//save the tag in case new fields are added, this way they are saved right away
+		tag.save();
 	}
 
 	public void saveConfig() {
@@ -264,7 +270,7 @@ public class ValkyrienWarfareMod {
 		tag.setDouble("physicsSpeed", ValkyrienWarfareMod.physSpeed);
 		tag.save();
 	}
-	
+
 	public static File getWorkingFolder() {
 		File toBeReturned;
 		try {
@@ -279,11 +285,11 @@ public class ValkyrienWarfareMod {
 		}
 		return null;
 	}
-	
+
 	public void registerCapibilities()	{
 		CapabilityManager.INSTANCE.register(IAirshipCounterCapability.class, new StorageAirshipCounter(), ImplAirshipCounterCapability.class);
 	}
-	
+
 	/**
 	 * Checks to see if a player's airship counter can be changed.
 	 * @param isAdding Should be true if you are adding a player, false if removing the player.
@@ -295,7 +301,7 @@ public class ValkyrienWarfareMod {
 			if (ValkyrienWarfareMod.maxAirships == -1)	{
 				return true;
 			}
-			
+
 			if (player.getCapability(ValkyrienWarfareMod.airshipCounter, null).getAirshipCount() >= ValkyrienWarfareMod.maxAirships)	{
 				return false;
 			} else {

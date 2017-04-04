@@ -4,9 +4,9 @@ import java.lang.reflect.Field;
 
 import ValkyrienWarfareBase.ValkyrienWarfareMod;
 import ValkyrienWarfareBase.API.RotationMatrices;
-import ValkyrienWarfareBase.API.Vector;
 import ValkyrienWarfareBase.PhysicsManagement.PhysicsWrapperEntity;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemBucket;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.PacketThreadUtil;
@@ -14,8 +14,14 @@ import net.minecraft.network.play.client.CPacketPlayerDigging;
 import net.minecraft.network.play.client.CPacketPlayerTryUseItemOnBlock;
 import net.minecraft.network.play.client.CPacketUpdateSign;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.math.BlockPos;
 
 public class CustomNetHandlerPlayServer extends NetHandlerPlayServer {
+
+	//Blame Sponge for this
+	public static final double dummyBlockReachDist = 999999999999999999999999999999999999D;
+	public double lastGoodBlockReachDist;
+	public int ticksSinceLastTry = 0;
 
 	public CustomNetHandlerPlayServer(MinecraftServer server, NetworkManager networkManagerIn, EntityPlayerMP playerIn) {
 		super(server, networkManagerIn, playerIn);
@@ -56,6 +62,8 @@ public class CustomNetHandlerPlayServer extends NetHandlerPlayServer {
 		movePacketCounter = toReplace.movePacketCounter;
 		lastMovePacketCounter = toReplace.lastMovePacketCounter;
 
+		lastGoodBlockReachDist = toReplace.playerEntity.interactionManager.getBlockReachDistance();
+
 		try {
 			Field intHashMapField = this.getClass().getDeclaredField("pendingTransactions");
 			boolean isObsfucated = false;
@@ -70,13 +78,27 @@ public class CustomNetHandlerPlayServer extends NetHandlerPlayServer {
 
 	@Override
 	public void processRightClickBlock(CPacketPlayerTryUseItemOnBlock packetIn) {
+		BlockPos packetPos = packetIn.getPos();
+		PhysicsWrapperEntity wrapper = ValkyrienWarfareMod.physicsManager.getObjectManagingPos(playerEntity.worldObj, packetPos);
+		if(playerEntity.interactionManager.getBlockReachDistance() != dummyBlockReachDist){
+			lastGoodBlockReachDist = playerEntity.interactionManager.getBlockReachDistance();
+		}
+		if(wrapper != null){
+			playerEntity.interactionManager.setBlockReachDistance(dummyBlockReachDist);
+			ticksSinceLastTry = 0;
+		}
+
 		PacketThreadUtil.checkThreadAndEnqueue(packetIn, this, this.playerEntity.getServerWorld());
-		PhysicsWrapperEntity wrapper = ValkyrienWarfareMod.physicsManager.getObjectManagingPos(playerEntity.worldObj, packetIn.getPos());
 		if (wrapper != null && wrapper.wrapping.coordTransform != null) {
 			float playerYaw = playerEntity.rotationYaw;
 			float playerPitch = playerEntity.rotationPitch;
 			RotationMatrices.applyTransform(wrapper.wrapping.coordTransform.wToLTransform, wrapper.wrapping.coordTransform.wToLRotation, playerEntity);
-			super.processRightClickBlock(packetIn);
+			if(playerEntity.getHeldItem(packetIn.getHand()) != null && playerEntity.getHeldItem(packetIn.getHand()).getItem() instanceof ItemBucket){
+				playerEntity.interactionManager.setBlockReachDistance(lastGoodBlockReachDist);
+			}
+			try{
+				super.processRightClickBlock(packetIn);
+			}catch(Exception e){}
 			RotationMatrices.applyTransform(wrapper.wrapping.coordTransform.lToWTransform, wrapper.wrapping.coordTransform.lToWRotation, playerEntity);
 			playerEntity.rotationYaw = playerYaw;
 			playerEntity.rotationPitch = playerPitch;
@@ -87,20 +109,25 @@ public class CustomNetHandlerPlayServer extends NetHandlerPlayServer {
 
 	@Override
 	public void processPlayerDigging(CPacketPlayerDigging packetIn) {
+		BlockPos packetPos = packetIn.getPosition();
+		PhysicsWrapperEntity wrapper = ValkyrienWarfareMod.physicsManager.getObjectManagingPos(playerEntity.worldObj, packetPos);
+		if(playerEntity.interactionManager.getBlockReachDistance() != dummyBlockReachDist){
+			lastGoodBlockReachDist = playerEntity.interactionManager.getBlockReachDistance();
+		}
+		if(wrapper != null){
+			playerEntity.interactionManager.setBlockReachDistance(dummyBlockReachDist);
+			ticksSinceLastTry = 0;
+		}
+
 		PacketThreadUtil.checkThreadAndEnqueue(packetIn, this, this.playerEntity.getServerWorld());
-		PhysicsWrapperEntity wrapper = ValkyrienWarfareMod.physicsManager.getObjectManagingPos(playerEntity.worldObj, packetIn.getPosition());
 		if (wrapper != null && wrapper.wrapping.coordTransform != null) {
 			float playerYaw = playerEntity.rotationYaw;
 			float playerPitch = playerEntity.rotationPitch;
-			Vector oldPlayerPos = new Vector(playerEntity);
 			RotationMatrices.applyTransform(wrapper.wrapping.coordTransform.wToLTransform, wrapper.wrapping.coordTransform.wToLRotation, playerEntity);
 			super.processPlayerDigging(packetIn);
+			RotationMatrices.applyTransform(wrapper.wrapping.coordTransform.lToWTransform, wrapper.wrapping.coordTransform.lToWRotation, playerEntity);
 			playerEntity.rotationYaw = playerYaw;
 			playerEntity.rotationPitch = playerPitch;
-			RotationMatrices.applyTransform(wrapper.wrapping.coordTransform.lToWTransform, wrapper.wrapping.coordTransform.lToWRotation, playerEntity);
-			playerEntity.posX = oldPlayerPos.X;
-			playerEntity.posY = oldPlayerPos.Y;
-			playerEntity.posZ = oldPlayerPos.Z;
 		} else {
 			super.processPlayerDigging(packetIn);
 		}
@@ -108,8 +135,17 @@ public class CustomNetHandlerPlayServer extends NetHandlerPlayServer {
 
 	@Override
 	public void processUpdateSign(CPacketUpdateSign packetIn) {
+		BlockPos packetPos = packetIn.getPosition();
+		PhysicsWrapperEntity wrapper = ValkyrienWarfareMod.physicsManager.getObjectManagingPos(playerEntity.worldObj, packetPos);
+		if(playerEntity.interactionManager.getBlockReachDistance() != dummyBlockReachDist){
+			lastGoodBlockReachDist = playerEntity.interactionManager.getBlockReachDistance();
+		}
+		if(wrapper != null){
+			playerEntity.interactionManager.setBlockReachDistance(dummyBlockReachDist);
+			ticksSinceLastTry = 0;
+		}
+
 		PacketThreadUtil.checkThreadAndEnqueue(packetIn, this, this.playerEntity.getServerWorld());
-		PhysicsWrapperEntity wrapper = ValkyrienWarfareMod.physicsManager.getObjectManagingPos(playerEntity.worldObj, packetIn.getPosition());
 		if (wrapper != null && wrapper.wrapping.coordTransform != null) {
 			float playerYaw = playerEntity.rotationYaw;
 			float playerPitch = playerEntity.rotationPitch;

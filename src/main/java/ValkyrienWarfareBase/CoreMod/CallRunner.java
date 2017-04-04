@@ -1,7 +1,5 @@
 package ValkyrienWarfareBase.CoreMod;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -11,6 +9,7 @@ import com.google.common.base.Predicate;
 import ValkyrienWarfareBase.ValkyrienWarfareMod;
 import ValkyrienWarfareBase.API.RotationMatrices;
 import ValkyrienWarfareBase.API.Vector;
+import ValkyrienWarfareBase.ChunkManagement.PhysicsChunkManager;
 import ValkyrienWarfareBase.Collision.EntityCollisionInjector;
 import ValkyrienWarfareBase.Collision.EntityPolygon;
 import ValkyrienWarfareBase.Collision.Polygon;
@@ -42,16 +41,81 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.IChunkGenerator;
 import net.minecraftforge.common.DimensionManager;
 
 public class CallRunner {
 
+	public static double getDistanceSq(TileEntity tile, double x, double y, double z){
+		if(tile.getWorld().isRemote){
+			double toReturn = tile.getDistanceSq(x, y, z);
+			//Assume on Ship
+			if(toReturn > 9999999D){
+				BlockPos pos = tile.getPos();
+				PhysicsWrapperEntity wrapper = ValkyrienWarfareMod.physicsManager.getObjectManagingPos(tile.getWorld(), pos);
+
+				if(wrapper != null){
+					Vector tilePos = new Vector(pos.getX() + .5D, pos.getY() + .5D, pos.getZ() + .5D);
+					wrapper.wrapping.coordTransform.fromLocalToGlobal(tilePos);
+
+					tilePos.X -= x;
+					tilePos.Y -= y;
+					tilePos.Z -= z;
+
+					return tilePos.lengthSq();
+				}
+			}
+
+			return toReturn;
+		}
+		return tile.getDistanceSq(x, y, z);
+	}
+
+	public static void markBlockRangeForRenderUpdate(World world, int x1, int y1, int z1, int x2, int y2, int z2){
+//		System.out.println((x2-x1)*(y2-y1)*(z2-z1));
+//		System.out.println(x1+":"+x2+":"+y1+":"+y2+":"+z1+":"+z2);
+
+		//Stupid OpenComputers fix, blame those assholes
+		if(x2 == 1 && y1 == 0 && z2 == 1){
+			x2 = x1 + 1;
+			x1--;
+
+			y1 = y2 - 1;
+			y2++;
+
+			z2 = z1 + 1;
+			z2--;
+		}
+
+		int midX = (x1 + x2) / 2;
+		int midY = (y1 + y2) / 2;
+		int midZ = (z1 + z2) / 2;
+		BlockPos newPos = new BlockPos(midX, midY, midZ);
+		PhysicsWrapperEntity wrapper = ValkyrienWarfareMod.physicsManager.getObjectManagingPos(world, newPos);
+		if (wrapper != null && wrapper.wrapping.renderer != null) {
+			wrapper.wrapping.renderer.updateRange(x1-1, y1-1, z1-1, x2+1, y2+1, z2+1);
+		}
+
+		if(wrapper == null){
+			world.markBlockRangeForRenderUpdate(x1, y1, z1, x2, y2, z2);
+		}
+	}
+
+	//Prevent random villages and shit from popping up on ships
+    public static void onPopulateChunk(Chunk chunk, IChunkGenerator generator){
+    	if(PhysicsChunkManager.isLikelyShipChunk(chunk.xPosition, chunk.zPosition)){
+//        	System.out.println("Tried populating a Ship Chunk, but failed!");
+    		return;
+    	}
+    	chunk.populateChunk(generator);
+    }
+
     public static void onAddEntity(Chunk chunk, Entity entityIn){
     	World world = chunk.worldObj;
-    	
+
     	int i = MathHelper.floor_double(entityIn.posX / 16.0D);
         int j = MathHelper.floor_double(entityIn.posZ / 16.0D);
-    	
+
         if(i == chunk.xPosition && j == chunk.zPosition){
         	chunk.addEntity(entityIn);
         }else{
@@ -61,10 +125,10 @@ public class CallRunner {
         	}
         }
     }
-	
+
 	public static BlockPos onGetPrecipitationHeight(World world, BlockPos posToCheck) {
 		BlockPos pos = world.getPrecipitationHeight(posToCheck);
-		if(!world.isRemote || ValkyrienWarfareMod.accurateRain){
+		if(!world.isRemote || !ValkyrienWarfareMod.accurateRain){
 			return pos;
 		}else{
 			return CallRunnerClient.onGetPrecipitationHeightClient(world, posToCheck);
@@ -387,38 +451,13 @@ public class CallRunner {
 		}
 	}
 
-	public static IBlockState onSetBlockState(Chunk chunkFor, BlockPos pos, IBlockState newState)
-    {
-		World world = chunkFor.worldObj;
-		IBlockState oldState = chunkFor.getBlockState(pos);
-		PhysicsWrapperEntity wrapper = ValkyrienWarfareMod.physicsManager.getObjectManagingPos(world, pos);
-		if (wrapper != null) {
-			if(!world.isRemote){
-				wrapper.wrapping.pilotingController.onSetBlockInShip(pos, newState);
-			}
-			wrapper.wrapping.onSetBlockState(oldState, newState, pos);
-			if (world.isRemote) {
-				wrapper.wrapping.renderer.markForUpdate();
-			}
-		}
-		return chunkFor.setBlockState(pos, newState);
-    }
-	
-	/*public static boolean onSetBlockState(World world, BlockPos pos, IBlockState newState, int flags) {
+	public static void onSetBlockState(IBlockState newState, int flags, World world, BlockPos pos){
 		IBlockState oldState = world.getBlockState(pos);
-		boolean toReturn = world.setBlockState(pos, newState, flags);
 		PhysicsWrapperEntity wrapper = ValkyrienWarfareMod.physicsManager.getObjectManagingPos(world, pos);
 		if (wrapper != null) {
-			if(!world.isRemote){
-				wrapper.wrapping.pilotingController.onSetBlockInShip(pos, newState);
-			}
 			wrapper.wrapping.onSetBlockState(oldState, newState, pos);
-			if (world.isRemote) {
-				wrapper.wrapping.renderer.markForUpdate();
-			}
 		}
-		return toReturn;
-	}*/
+    }
 
 	public static RayTraceResult onRayTraceBlocks(World world, Vec3d vec31, Vec3d vec32, boolean stopOnLiquid, boolean ignoreBlockWithoutBoundingBox, boolean returnLastUncollidableBlock) {
 		RayTraceResult vanillaTrace = world.rayTraceBlocks(vec31, vec32, stopOnLiquid, ignoreBlockWithoutBoundingBox, returnLastUncollidableBlock);
@@ -426,15 +465,15 @@ public class CallRunner {
 		if (physManager == null) {
 			return vanillaTrace;
 		}
-		
+
 		Vec3d playerEyesPos = vec31;
 		Vec3d playerReachVector = vec32.subtract(vec31);
-		
+
 		AxisAlignedBB playerRangeBB = new AxisAlignedBB(vec31.xCoord, vec31.yCoord, vec31.zCoord, vec32.xCoord, vec32.yCoord, vec32.zCoord);
-		
+
 		List<PhysicsWrapperEntity> nearbyShips = physManager.getNearbyPhysObjects(playerRangeBB);
 		boolean changed = false;
-		
+
 		double reachDistance = playerReachVector.lengthVector();
 		double worldResultDistFromPlayer = 420000000D;
 		if (vanillaTrace != null && vanillaTrace.hitVec != null) {
@@ -461,39 +500,48 @@ public class CallRunner {
 				}
 			}
 		}
+
 		return vanillaTrace;
 	}
 
 	public static void onEntityMove(Entity entity, double dx, double dy, double dz) {
+		double movDistSq = (dx*dx) + (dy*dy) + (dz*dz);
+		if(movDistSq > 1000000){
+			//Assume this will take us to Ship coordinates
+			double newX = entity.posX + dx;
+			double newY = entity.posY + dy;
+			double newZ = entity.posZ + dz;
+			BlockPos newPosInBlock = new BlockPos(newX,newY,newZ);
+
+			PhysicsWrapperEntity wrapper = ValkyrienWarfareMod.physicsManager.getObjectManagingPos(entity.worldObj, newPosInBlock);
+
+			if(wrapper == null){
+//				Just forget this even happened
+//				System.err.println("An entity just tried moving like a millions miles an hour. Probably VW's fault, sorry about that.");
+				return;
+			}
+
+			Vector endPos = new Vector(newX,newY,newZ);
+			RotationMatrices.applyTransform(wrapper.wrapping.coordTransform.wToLTransform, endPos);
+
+			dx = endPos.X - entity.posX;
+			dy = endPos.Y - entity.posY;
+			dz = endPos.Z - entity.posZ;
+		}
 		if (!EntityCollisionInjector.alterEntityMovement(entity, dx, dy, dz)) {
 			entity.moveEntity(dx, dy, dz);
 		}
 	}
-
-	public static void onEntityRemoved(World world, Entity removed) {
-		if (removed instanceof PhysicsWrapperEntity) {
-			ValkyrienWarfareMod.physicsManager.onShipUnload((PhysicsWrapperEntity) removed);
-		}
-		world.onEntityRemoved(removed);
-	}
-
-	public static void onEntityAdded(World world, Entity added) {
-//		if (added instanceof PhysicsWrapperEntity) {
-//			ValkyrienWarfareMod.physicsManager.onShipLoad((PhysicsWrapperEntity) added);
-//		}
-		world.onEntityAdded(added);
-	}
-
     public static Vec3d onGetLook(Entity entityFor, float partialTicks){
     	Vec3d defaultOutput = entityFor.getLook(partialTicks);
-    	
+
     	PhysicsWrapperEntity wrapper = ValkyrienWarfareMod.physicsManager.getShipFixedOnto(entityFor);
 		if(wrapper != null){
 			Vector newOutput = new Vector(defaultOutput);
 			RotationMatrices.applyTransform(wrapper.wrapping.coordTransform.RlToWRotation, newOutput);
 			return newOutput.toVec3d();
 		}
-    	
+
     	return defaultOutput;
     }
 

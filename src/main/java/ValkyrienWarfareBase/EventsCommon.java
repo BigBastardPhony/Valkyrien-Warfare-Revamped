@@ -4,41 +4,37 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.logging.Level;
 
-import ValkyrienWarfareBase.API.RotationMatrices;
-import ValkyrienWarfareBase.API.Vector;
 import ValkyrienWarfareBase.Capability.IAirshipCounterCapability;
 import ValkyrienWarfareBase.CoreMod.ValkyrienWarfarePlugin;
 import ValkyrienWarfareBase.Interaction.CustomNetHandlerPlayServer;
+import ValkyrienWarfareBase.Interaction.ValkyrienWarfareWorldEventListener;
 import ValkyrienWarfareBase.PhysicsManagement.PhysicsTickHandler;
 import ValkyrienWarfareBase.PhysicsManagement.PhysicsWrapperEntity;
-import ValkyrienWarfareCombat.Entity.EntityMountingWeaponBase;
 import ValkyrienWarfareControl.Piloting.ClientPilotingManager;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityArmorStand;
-import net.minecraft.entity.item.EntityBoat;
-import net.minecraft.entity.item.EntityFallingBlock;
-import net.minecraft.entity.passive.EntityPig;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemBucket;
 import net.minecraft.nbt.NBTPrimitive;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.player.FillBucketEvent;
 import net.minecraftforge.event.entity.player.PlayerContainerEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.HarvestCheck;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteract;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.BlockEvent.BreakEvent;
 import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
@@ -59,30 +55,6 @@ public class EventsCommon {
 	public static HashMap<EntityPlayerMP, Double[]> lastPositions = new HashMap<EntityPlayerMP, Double[]>();
 
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
-	public void onRightClickBlockEvent(RightClickBlock event){
-		event.setResult(Result.ALLOW);
-	}
-	
-	@SubscribeEvent(priority = EventPriority.HIGHEST)
-	public void onEntityJoinWorldEvent(EntityJoinWorldEvent event){
-		Entity entity = event.getEntity();
-		World world = entity.worldObj;
-		BlockPos posAt = new BlockPos(entity);
-		PhysicsWrapperEntity wrapper = ValkyrienWarfareMod.physicsManager.getObjectManagingPos(world, posAt);
-		if (!(entity instanceof EntityFallingBlock) && wrapper != null && wrapper.wrapping.coordTransform != null) {
-			if (entity instanceof EntityMountingWeaponBase || entity instanceof EntityArmorStand || entity instanceof EntityPig || entity instanceof EntityBoat) {
-//				entity.startRiding(wrapper);
-				wrapper.wrapping.fixEntity(entity, new Vector(entity));
-				wrapper.wrapping.queueEntityForMounting(entity);
-			}
-			RotationMatrices.applyTransform(wrapper.wrapping.coordTransform.lToWTransform, wrapper.wrapping.coordTransform.lToWRotation, entity);
-		}
-		if(entity instanceof PhysicsWrapperEntity){
-			ValkyrienWarfareMod.physicsManager.onShipLoad((PhysicsWrapperEntity) entity);
-		}
-	}
-	
-	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void onEntityInteractEvent(EntityInteract event) {
 		event.setResult(Result.ALLOW);
 	}
@@ -98,19 +70,62 @@ public class EventsCommon {
 				}
 				if (event.phase == Phase.END) {
 					PhysicsTickHandler.onWorldTickEnd(worldFor);
+					if(worldFor instanceof WorldServer){
+						addOrRemovedAllShipChunksFromMap((WorldServer) worldFor, false);
+					}
+				}
+			}
+		}
+	}
+
+	@SubscribeEvent(priority = EventPriority.LOWEST)
+	public void worldTick(TickEvent.WorldTickEvent event){
+		if ((event.phase == TickEvent.Phase.END) && (!event.world.isRemote)){
+			World worldFor = event.world;
+			if(worldFor instanceof WorldServer){
+				addOrRemovedAllShipChunksFromMap((WorldServer) worldFor, true);
+			}
+		}
+	}
+
+	/**
+	 * Either removes or adds all Ship Chunk entries to the World. Its a stupid fix for ChickenChunks; Blame Him For This Mess!!!
+	 * Necessary to prevent ChickenChunks from trying to unload the Ship Chunks, and remove the player index in WatchingPlayers while its at it!
+	 * @param worldFor
+	 * @param amAdding Use true to add all chunks, false to remove all chunks
+	 */
+	public void addOrRemovedAllShipChunksFromMap(WorldServer worldFor, boolean amAdding){
+		for(PhysicsWrapperEntity wrapper:ValkyrienWarfareMod.physicsManager.getManagerForWorld(worldFor).physicsEntities){
+			for(Chunk[] chunks:wrapper.wrapping.claimedChunks){
+				for(Chunk chunk:chunks){
+					if(amAdding){
+						((WorldServer)worldFor).getChunkProvider().id2ChunkMap.put(ChunkPos.chunkXZ2Int(chunk.xPosition, chunk.zPosition), chunk);
+					}else{
+						((WorldServer)worldFor).getChunkProvider().id2ChunkMap.remove(ChunkPos.chunkXZ2Int(chunk.xPosition, chunk.zPosition));
+					}
 				}
 			}
 		}
 	}
 
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
+	public void onFillBucketEvent(FillBucketEvent event){
+//		event.setResult(Result.ALLOW);
+	}
+
+	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void onPlayerTickEvent(PlayerTickEvent event) {
 		if (!event.player.worldObj.isRemote && event.player != null) {
 			EntityPlayerMP p = (EntityPlayerMP) event.player;
-			
 			try{
 				if (!(p.connection instanceof CustomNetHandlerPlayServer)) {
 					p.connection = new CustomNetHandlerPlayServer(p.connection);
+				}else{
+					CustomNetHandlerPlayServer customNetHandler = (CustomNetHandlerPlayServer)p.connection;
+					if(p.interactionManager.getBlockReachDistance() == CustomNetHandlerPlayServer.dummyBlockReachDist && customNetHandler.ticksSinceLastTry == 2){
+						p.interactionManager.setBlockReachDistance(((CustomNetHandlerPlayServer)p.connection).lastGoodBlockReachDist);
+					}
+					customNetHandler.ticksSinceLastTry ++;
 				}
 			}catch(Exception e){
 				e.printStackTrace();
@@ -315,8 +330,9 @@ public class EventsCommon {
 
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void onWorldLoad(WorldEvent.Load event) {
-		// ValkyrienWarfareMod.chunkManager.initWorld(event.getWorld());
-		ValkyrienWarfareMod.physicsManager.initWorld(event.getWorld());
+		World world = event.getWorld();
+		ValkyrienWarfareMod.physicsManager.initWorld(world);
+		world.addEventListener(new ValkyrienWarfareWorldEventListener(world));
 	}
 
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -382,22 +398,22 @@ public class EventsCommon {
 		if(evt.getObject() instanceof EntityPlayer){
 			evt.addCapability(new ResourceLocation(ValkyrienWarfareMod.MODID, "IAirshipCounter"), new ICapabilitySerializable<NBTPrimitive>() {
 				IAirshipCounterCapability inst = ValkyrienWarfareMod.airshipCounter.getDefaultInstance();
-	
+
 				@Override
 				public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
 					return capability == ValkyrienWarfareMod.airshipCounter;
 				}
-	
+
 				@Override
 				public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
 					return capability == ValkyrienWarfareMod.airshipCounter ? ValkyrienWarfareMod.airshipCounter.<T>cast(inst) : null;
 				}
-	
+
 				@Override
 				public NBTPrimitive serializeNBT() {
 					return (NBTPrimitive) ValkyrienWarfareMod.airshipCounter.getStorage().writeNBT(ValkyrienWarfareMod.airshipCounter, inst, null);
 				}
-	
+
 				@Override
 				public void deserializeNBT(NBTPrimitive nbt) {
 					ValkyrienWarfareMod.airshipCounter.getStorage().readNBT(ValkyrienWarfareMod.airshipCounter, inst, null, nbt);
@@ -424,7 +440,12 @@ public class EventsCommon {
 	public void onRightClick(PlayerInteractEvent.RightClickBlock event) {
 		if (!event.getWorld().isRemote)	{
 			PhysicsWrapperEntity physObj = ValkyrienWarfareMod.physicsManager.getObjectManagingPos(event.getWorld(), event.getPos());
-			if (physObj != null)	{
+			if (physObj != null) {
+				//Bucket fix, probably not that important
+				if(event.getEntityPlayer().getHeldItem(event.getHand()) != null && event.getEntityPlayer().getHeldItem(event.getHand()).getItem() instanceof ItemBucket) {
+					event.setResult(Result.ALLOW);
+					event.setCanceled(false);
+				}
 				if (ValkyrienWarfareMod.runAirshipPermissions && !(physObj.wrapping.creator.equals(event.getEntityPlayer().entityUniqueID.toString()) || physObj.wrapping.allowedUsers.contains(event.getEntityPlayer().entityUniqueID.toString())))	{
 					event.getEntityPlayer().addChatMessage(new TextComponentString("You need to be added to the airship to do that!" + (physObj.wrapping.creator == null || physObj.wrapping.creator.trim().isEmpty() ? " Try using \"/airshipSettings claim\"!" : "")));
 					event.setCanceled(true);
@@ -433,12 +454,12 @@ public class EventsCommon {
 			}
 		}
 	}
-	
+
 	@SubscribeEvent
 	public void onBlockBreak(BlockEvent.BreakEvent event)	{
 		if (!event.getWorld().isRemote)	{
 			PhysicsWrapperEntity physObj = ValkyrienWarfareMod.physicsManager.getObjectManagingPos(event.getWorld(), event.getPos());
-			if (physObj != null)	{
+			if (physObj != null) {
 				if (ValkyrienWarfareMod.runAirshipPermissions && !(physObj.wrapping.creator.equals(event.getPlayer().entityUniqueID.toString()) || physObj.wrapping.allowedUsers.contains(event.getPlayer().entityUniqueID.toString())))	{
 					event.getPlayer().addChatMessage(new TextComponentString("You need to be added to the airship to do that!" + (physObj.wrapping.creator == null || physObj.wrapping.creator.trim().isEmpty() ? " Try using \"/airshipSettings claim\"!" : "")));
 					event.setCanceled(true);
