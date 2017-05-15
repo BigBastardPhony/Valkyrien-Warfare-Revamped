@@ -70,11 +70,11 @@ public class TransformAdapter extends ClassVisitor {
 	public boolean runTransformer(int opcode, String calledName, String calledDesc, String calledOwner, MethodVisitor mv, boolean itf) {
 
 		//TODO: Move to separate mod
-//		if (isMethod(calledDesc, "()Z", calledName, MinecraftServerName, "isServerInOnlineMode", "RENAMEME", calledOwner)) {
-//			mv.visitInsn(Opcodes.POP);
-//			mv.visitMethodInsn(Opcodes.INVOKESTATIC, ValkyrienWarfarePlugin.PathCommon, "isServerInOnlineMode", "()Z", itf);
-//			return false;
-//		}
+		if (isMethod(calledDesc, "()Z", calledName, MinecraftServerName, "isServerInOnlineMode", "RENAMEME", calledOwner)) {
+			mv.visitInsn(Opcodes.POP);
+			mv.visitMethodInsn(Opcodes.INVOKESTATIC, ValkyrienWarfarePlugin.PathCommon, "isServerInOnlineMode", "()Z", itf);
+			return false;
+		}
 
 		//TODO: Move to seperate mod
 		if (isMethod(calledDesc, "()I", calledName, HttpUtilName, "getSuitableLanPort", "RENAMEME", calledOwner)) {
