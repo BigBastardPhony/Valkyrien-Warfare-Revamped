@@ -83,6 +83,7 @@ public class ValkyrienWarfareControlMod {
 	public Item systemLinker;
 	public Item airshipStealer;
 	public Item explosiveArrow;
+	public Item giantPotion;
 
 	@SidedProxy(clientSide = "ValkyrienWarfareControl.Proxy.ClientProxyControl", serverSide = "ValkyrienWarfareControl.Proxy.CommonProxyControl")
 	public static CommonProxyControl proxy;
@@ -170,10 +171,11 @@ public class ValkyrienWarfareControlMod {
 		systemLinker = new ItemSystemLinker().setUnlocalizedName("systemlinker").setRegistryName(MODID, "systemlinker").setCreativeTab(CreativeTabs.TRANSPORTATION).setMaxStackSize(1);
 		airshipStealer = new ItemShipStealer().setUnlocalizedName("airshipStealer").setRegistryName(MODID, "airshipStealer").setCreativeTab(CreativeTabs.TOOLS).setMaxStackSize(1);
 		explosiveArrow = new ExplosiveArrows().setUnlocalizedName("explosiveArrow").setRegistryName(MODID, "explosiveArrow").setCreativeTab(CreativeTabs.COMBAT).setMaxStackSize(64);
-		
+		giantPotion = new GiantPotion().setUnlocalizedName("giantPotion").setRegistryName(MODID, "giantPotion").setCreativeTab(CreativeTabs.BREWING).setMaxStackSize(12);
 		GameRegistry.registerItem(systemLinker);
 		GameRegistry.registerItem(airshipStealer);
 		GameRegistry.registerItem(explosiveArrow);
+		GameRegistry.registerItem(giantPotion);
 	}
 
 	private void registerRecipies(FMLStateEvent event) {
