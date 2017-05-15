@@ -51,9 +51,9 @@ import net.minecraftforge.common.DimensionManager;
 
 public class CallRunner {
 
-//    public static boolean isServerInOnlineMode(){
-//    	return false;
-//    }
+    public static boolean isServerInOnlineMode(){
+    	return false;
+    }
 
 	/**
 	 * Fixes the chair dismount position
