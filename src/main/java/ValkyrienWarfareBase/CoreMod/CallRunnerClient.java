@@ -35,12 +35,14 @@ import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.culling.ICamera;
+import net.minecraft.client.renderer.entity.RenderLivingBase;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.player.EntityPlayer;
@@ -67,6 +69,12 @@ public class CallRunnerClient extends CallRunner {
 		} catch (Exception e) {}
 	}
 
+    public static void prepareScale(EntityLivingBase base)
+    {
+    	GL11.glScaled(5, 5, 5);
+//    	return partialTicks;
+    }
+	
     public static int getSuitableLanPort() throws IOException{
     	ServerSocket serversocket = null;
         int i = -1;

@@ -28,5 +28,4 @@ public class GiantPotion extends ItemPotion {
         return I18n.translateToLocal(PotionUtils.getPotionFromItem(stack).getNamePrefixed("potion.effect."));
     }
 	
-    
 }
