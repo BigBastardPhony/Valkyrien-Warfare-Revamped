@@ -6,6 +6,9 @@ item.explosiveArrow.name=Explosive Arrow
 tile.shippilotschair.name=Piloting Chair
 tile.dopedetherium.name=Doped Etherium
 
+potion.effect.embiggening=Potion of Embiggening
+effect.embiggen=When Applied - +1 Embiggen
+
 #ENGINES
 tile.basicEngine.name=Basic Engine
 tile.advancedEngine.name=Advanced Engine

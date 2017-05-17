@@ -36,7 +36,11 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionEffect;
+import net.minecraft.potion.PotionType;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -102,6 +106,11 @@ public class ValkyrienWarfareControlMod {
 		proxy.init(event);
 		registerBlocks(event);
 		registerTileEntities(event);
+		
+		Potion.REGISTRY.register(28, new ResourceLocation("embiggening"), (new BigPotion()).setIconIndexVisible(6, 3).setPotionName("effect.embiggen").setBeneficial());
+		PotionType.REGISTRY.register(911, new ResourceLocation("embiggening"), new PotionType("embiggening", new PotionEffect[]{new PotionEffect(Potion.REGISTRY.getObject(new ResourceLocation("embiggening")))}));
+		
+		
 		registerItems(event);
 		registerRecipies(event);
 		registerNetworks(event);
@@ -171,11 +180,11 @@ public class ValkyrienWarfareControlMod {
 		systemLinker = new ItemSystemLinker().setUnlocalizedName("systemlinker").setRegistryName(MODID, "systemlinker").setCreativeTab(CreativeTabs.TRANSPORTATION).setMaxStackSize(1);
 		airshipStealer = new ItemShipStealer().setUnlocalizedName("airshipStealer").setRegistryName(MODID, "airshipStealer").setCreativeTab(CreativeTabs.TOOLS).setMaxStackSize(1);
 		explosiveArrow = new ExplosiveArrows().setUnlocalizedName("explosiveArrow").setRegistryName(MODID, "explosiveArrow").setCreativeTab(CreativeTabs.COMBAT).setMaxStackSize(64);
-		giantPotion = new GiantPotion().setUnlocalizedName("giantPotion").setRegistryName(MODID, "giantPotion").setCreativeTab(CreativeTabs.BREWING).setMaxStackSize(12);
+//		giantPotion = new GiantPotion().setUnlocalizedName("giantPotion").setRegistryName(MODID, "giantPotion").setCreativeTab(CreativeTabs.BREWING).setMaxStackSize(12);
 		GameRegistry.registerItem(systemLinker);
 		GameRegistry.registerItem(airshipStealer);
 		GameRegistry.registerItem(explosiveArrow);
-		GameRegistry.registerItem(giantPotion);
+//		GameRegistry.registerItem(giantPotion);
 	}
 
 	private void registerRecipies(FMLStateEvent event) {
