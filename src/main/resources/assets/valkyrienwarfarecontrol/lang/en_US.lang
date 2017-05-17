@@ -8,6 +8,9 @@ tile.shippassengerchair.name=Passenger Chair
 tile.dopedetherium.name=Doped Etherium
 tile.balloonburner.name=Balloon Burner
 
+potion.effect.embiggening=Potion of Embiggening
+effect.embiggen=When Applied - +1 Embiggen
+
 #ENGINES
 tile.basicEngine.name=Basic Engine
 tile.advancedEngine.name=Advanced Engine

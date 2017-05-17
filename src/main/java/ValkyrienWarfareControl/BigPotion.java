@@ -16,4 +16,9 @@ public class BigPotion extends Potion {
 		//entityLivingBaseIn.storePropety("MakeMeBig")
 	 }
 	
+	public Potion setIconIndexVisible(int p_76399_1_, int p_76399_2_)
+    {
+        return this.setIconIndex(p_76399_1_, p_76399_2_);
+    }
+	
 }

@@ -37,7 +37,11 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionEffect;
+import net.minecraft.potion.PotionType;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -106,6 +110,7 @@ public class ValkyrienWarfareControlMod {
 	@EventHandler
 	public void init(FMLInitializationEvent event) {
 		registerTileEntities(event);
+
 		registerRecipies(event);
 		registerNetworks(event);
 		NetworkRegistry.INSTANCE.registerGuiHandler(this, new ControlGUIHandler());

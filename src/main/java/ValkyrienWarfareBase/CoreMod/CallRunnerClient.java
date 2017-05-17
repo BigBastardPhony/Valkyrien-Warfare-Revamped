@@ -71,7 +71,7 @@ public class CallRunnerClient extends CallRunner {
 
     public static void prepareScale(EntityLivingBase base)
     {
-    	GL11.glScaled(5, 5, 5);
+    	GL11.glScaled(.05,.05,.05);
 //    	return partialTicks;
     }
 
