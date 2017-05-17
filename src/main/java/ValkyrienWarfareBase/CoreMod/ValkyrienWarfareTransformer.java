@@ -10,6 +10,7 @@ import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
@@ -38,6 +39,18 @@ public class ValkyrienWarfareTransformer implements IClassTransformer {
 				new SpecificClassNodeChildrenTransformer.Builder("net/minecraft/tileentity/TileEntity", 0)
 //				.node(SpecificMethodNodeTransformer.instructionsInserterBeforeReturn(ValkyrienWarfarePlugin.isObfuscatedEnvironment ? "func_145835_a" : "getDistanceSq", 0, () -> new InsnListBuilder(new VarInsnNode(ALOAD, 0), new VarInsnNode(DLOAD, 1), new VarInsnNode(DLOAD, 3), new VarInsnNode(DLOAD, 5), new MethodInsnNode(INVOKESTATIC, ValkyrienWarfarePlugin.PathCommon, "getDistanceSq", "(DLnet/minecraft/tileentity/TileEntity;DDD)D", false)).build()))
 //				.node(SpecificMethodNodeTransformer.instructionsInserterBeforeReturn(ValkyrienWarfarePlugin.isObfuscatedEnvironment ? "func_184177_bl" : "getRenderBoundingBox", 0, () -> new InsnListBuilder(new VarInsnNode(ALOAD, 0), new MethodInsnNode(INVOKESTATIC, ValkyrienWarfarePlugin.PathClient, "getRenderBoundingBox", "(Lnet/minecraft/tileentity/TileEntity;)Lnet/minecraft/util/math/AxisAlignedBB;", false)).build()))
+				.build(),
+				new SpecificClassNodeChildrenTransformer.Builder("net/minecraft/client/renderer/entity/RenderLivingBase", 0)
+				.node(SpecificMethodNodeTransformer.instructionsBeginningInserter("prepareScale", 0, 
+						
+						new InsnListBuilder(
+								new VarInsnNode(Opcodes.ALOAD, 1),
+								new MethodInsnNode(INVOKESTATIC, ValkyrienWarfarePlugin.PathClient, "prepareScale", "(Lnet/minecraft/entity/EntityLivingBase;)V", false)).build()
+						
+						
+						))
+				
+				
 				.build(),
 				new SpecificClassNodeChildrenTransformer.Builder("net/minecraft/entity/Entity", 0)
 				.node(SpecificClassNodeTransformer.setParent("net/minecraft/entity/Entity", 10, old -> "ValkyrienWarfareBase/Interaction/EntityDraggable"))
