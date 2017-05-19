@@ -106,11 +106,11 @@ public class ValkyrienWarfareControlMod {
 		proxy.init(event);
 		registerBlocks(event);
 		registerTileEntities(event);
-		
+
 		Potion.REGISTRY.register(28, new ResourceLocation("embiggening"), (new BigPotion()).setIconIndexVisible(6, 3).setPotionName("effect.embiggen").setBeneficial());
-		PotionType.REGISTRY.register(911, new ResourceLocation("embiggening"), new PotionType("embiggening", new PotionEffect[]{new PotionEffect(Potion.REGISTRY.getObject(new ResourceLocation("embiggening")))}));
-		
-		
+		PotionType.REGISTRY.register(911, new ResourceLocation("embiggening"), new PotionType("embiggening", new PotionEffect[]{new PotionEffect(Potion.REGISTRY.getObject(new ResourceLocation("embiggening")),1,1)}));
+
+
 		registerItems(event);
 		registerRecipies(event);
 		registerNetworks(event);
