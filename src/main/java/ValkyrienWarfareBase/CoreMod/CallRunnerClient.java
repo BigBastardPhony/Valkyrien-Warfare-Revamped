@@ -44,6 +44,7 @@ import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.monster.EntitySlime;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
@@ -73,14 +74,9 @@ public class CallRunnerClient extends CallRunner {
     {
     	ISizeCapability sizeCapability = base.getCapability(GullivarMod.entitySize, null);
     	if(sizeCapability != null){
-//    		System.out.println(sizeCapability.getScaleValue());
-//    		sizeCapability.setScaleValue(.1);
     		double scaleValue = sizeCapability.getScaleValue();
-    		sizeCapability.updateEntityScale(base);
     		GL11.glScaled(scaleValue, scaleValue, scaleValue);
     	}
-//    	GL11.glScaled(.05,.05,.05);
-//    	return partialTicks;
     }
 
     public static int getSuitableLanPort() throws IOException{
@@ -140,8 +136,8 @@ public class CallRunnerClient extends CallRunner {
 			entity.posZ = entity.prevPosZ = entity.lastTickPosZ = playerPosNew.Z;
 		}
 
-		Vector eyeVector = new Vector(0, entity.getEyeHeight(), 0);
-
+		Vector eyeVector = new Vector(0, CallRunner.getEyeHeight(entity), 0);
+		
 		if (entity instanceof EntityLivingBase && ((EntityLivingBase)entity).isPlayerSleeping()){
 			eyeVector.Y += .7D;
         }

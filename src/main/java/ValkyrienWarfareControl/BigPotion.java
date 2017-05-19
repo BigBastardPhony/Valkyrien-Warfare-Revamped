@@ -1,7 +1,10 @@
 package ValkyrienWarfareControl;
 
+import javax.annotation.Nullable;
+
 import Gullivar.GullivarMod;
 import Gullivar.Capability.ISizeCapability;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.potion.Potion;
@@ -15,13 +18,19 @@ public class BigPotion extends Potion {
 	@Override
 	public void performEffect(EntityLivingBase base, int p_76394_2_) {
 		ISizeCapability sizeCapability = base.getCapability(GullivarMod.entitySize, null);
-    	if(base != null && base instanceof EntityPlayer){
-    		sizeCapability.setScaleValue(.1);
+    	if(base != null){
+    		sizeCapability.setScaleValue(sizeCapability.getScaleValue() * 3D);
     		sizeCapability.updateEntityScale(base);
     		System.out.println("SSHEEEEIT: " + sizeCapability.getScaleValue());
     	}
 		//entityLivingBaseIn.storePropety("MakeMeBig")
-	 }
+	}
+	
+	@Override
+	public void affectEntity(@Nullable Entity source, @Nullable Entity indirectSource, EntityLivingBase entityLivingBaseIn, int amplifier, double health) {
+		performEffect(entityLivingBaseIn, 1);
+		System.out.println("Shalome");
+	}
 
 	public Potion setIconIndexVisible(int p_76399_1_, int p_76399_2_) {
         return this.setIconIndex(p_76399_1_, p_76399_2_);
