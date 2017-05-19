@@ -8,6 +8,8 @@ import java.util.List;
 
 import org.lwjgl.opengl.GL11;
 
+import Gullivar.GullivarMod;
+import Gullivar.Capability.ISizeCapability;
 import ValkyrienWarfareBase.ValkyrienWarfareMod;
 import ValkyrienWarfareBase.API.RotationMatrices;
 import ValkyrienWarfareBase.API.Vector;
@@ -35,14 +37,12 @@ import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.culling.ICamera;
-import net.minecraft.client.renderer.entity.RenderLivingBase;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.player.EntityPlayer;
@@ -71,7 +71,15 @@ public class CallRunnerClient extends CallRunner {
 
     public static void prepareScale(EntityLivingBase base)
     {
-    	GL11.glScaled(.05,.05,.05);
+    	ISizeCapability sizeCapability = base.getCapability(GullivarMod.entitySize, null);
+    	if(sizeCapability != null){
+//    		System.out.println(sizeCapability.getScaleValue());
+//    		sizeCapability.setScaleValue(.1);
+    		double scaleValue = sizeCapability.getScaleValue();
+    		sizeCapability.updateEntityScale(base);
+    		GL11.glScaled(scaleValue, scaleValue, scaleValue);
+    	}
+//    	GL11.glScaled(.05,.05,.05);
 //    	return partialTicks;
     }
 
