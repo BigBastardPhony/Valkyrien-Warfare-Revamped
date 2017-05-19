@@ -56,6 +56,23 @@ public class ValkyrienWarfareTransformer implements IClassTransformer {
 				.node(SpecificClassNodeTransformer.setParent("net/minecraft/entity/Entity", 10, old -> "ValkyrienWarfareBase/Interaction/EntityDraggable"))
 				.node(SpecificMethodNodeTransformer.instructionsNodesTransformer("<init>", 5, node -> node.getOpcode() == INVOKESPECIAL && ((MethodInsnNode) node).owner.equals("java/lang/Object") && ((MethodInsnNode) node).name.equals("<init>") ? new MethodInsnNode(INVOKESPECIAL, "ValkyrienWarfareBase/Interaction/EntityDraggable", "<init>", "()V", false) : node))
 				.node(SpecificMethodNodeTransformer.instructionsInserterBeforeReturn(ValkyrienWarfarePlugin.isObfuscatedEnvironment ? "func_70092_e(DDD)D" : "getDistanceSq(DDD)D", 0, () -> new InsnListBuilder(new VarInsnNode(ALOAD, 0), new VarInsnNode(DLOAD, 1), new VarInsnNode(DLOAD, 3), new VarInsnNode(DLOAD, 5), new MethodInsnNode(INVOKESTATIC, ValkyrienWarfarePlugin.PathCommon, "getDistanceSq", "(DLnet/minecraft/entity/Entity;DDD)D", false)).build()))
+				.node(SpecificMethodNodeTransformer.instructionsBeginningInserter("setSize", 0, 
+						
+						new InsnListBuilder(
+								new VarInsnNode(Opcodes.ALOAD, 0),
+								new VarInsnNode(Opcodes.FLOAD, 1),
+								new MethodInsnNode(INVOKESTATIC, ValkyrienWarfarePlugin.PathCommon, "fixMySize", "(Lnet/minecraft/entity/Entity;F)F", false),
+								new VarInsnNode(Opcodes.FSTORE, 1),
+								
+								new VarInsnNode(Opcodes.ALOAD, 0),
+								new VarInsnNode(Opcodes.FLOAD, 2),
+								new MethodInsnNode(INVOKESTATIC, ValkyrienWarfarePlugin.PathCommon, "fixMySize", "(Lnet/minecraft/entity/Entity;F)F", false),
+								new VarInsnNode(Opcodes.FSTORE, 2)
+								).build()
+								
+						
+						))
+				
 				.build());
 	}
 

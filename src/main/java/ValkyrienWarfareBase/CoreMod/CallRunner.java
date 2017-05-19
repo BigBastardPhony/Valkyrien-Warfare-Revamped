@@ -9,6 +9,8 @@ import javax.annotation.Nullable;
 
 import com.google.common.base.Predicate;
 
+import Gullivar.GullivarMod;
+import Gullivar.Capability.ISizeCapability;
 import ValkyrienWarfareBase.ValkyrienWarfareMod;
 import ValkyrienWarfareBase.API.RotationMatrices;
 import ValkyrienWarfareBase.API.Vector;
@@ -50,6 +52,85 @@ import net.minecraft.world.chunk.IChunkGenerator;
 import net.minecraftforge.common.DimensionManager;
 
 public class CallRunner {
+
+    public static void updateSize(EntityPlayer player){
+    	if(true){
+//    		return;
+    	}
+    	float f;
+        float f1;
+
+//        System.out.print("GET IT!");
+
+        if (player.isElytraFlying())
+        {
+            f = 0.6F;
+            f1 = 0.6F;
+        }
+        else if (player.isPlayerSleeping())
+        {
+            f = 0.2F;
+            f1 = 0.2F;
+        }
+        else if (player.isSneaking())
+        {
+            f = 0.6F;
+            f1 = 1.65F;
+        }
+        else
+        {
+            f = 0.6F;
+            f1 = 1.8F;
+        }
+
+        if (f != player.width || f1 != player.height)
+        {
+            AxisAlignedBB axisalignedbb = player.getEntityBoundingBox();
+            axisalignedbb = new AxisAlignedBB(axisalignedbb.minX, axisalignedbb.minY, axisalignedbb.minZ, axisalignedbb.minX + (double)f, axisalignedbb.minY + (double)f1, axisalignedbb.minZ + (double)f);
+
+            if (!player.worldObj.collidesWithAnyBlock(axisalignedbb))
+            {
+            	float width = f;
+            	float height = f1;
+
+
+            	if (width != player.width || height != player.height)
+                {
+
+            		ISizeCapability sizeCapability = player.getCapability(GullivarMod.entitySize, null);
+                	float scale = 1;
+            		if(sizeCapability != null){
+            			scale = (float) sizeCapability.getScaleValue();
+                	}
+
+                    f = player.width;
+                    player.width = width * scale;
+                    player.height = height * scale;
+                    AxisAlignedBB axisalignedbb2 = player.getEntityBoundingBox();
+                    player.setEntityBoundingBox(new AxisAlignedBB(axisalignedbb2.minX, axisalignedbb2.minY, axisalignedbb2.minZ, axisalignedbb2.minX + (double)player.width, axisalignedbb2.minY + (double)player.height, axisalignedbb2.minZ + (double)player.width));
+
+                    if (player.width > f && !player.firstUpdate && !player.worldObj.isRemote)
+                    {
+                        player.moveEntity((double)(f - player.width), 0.0D, (double)(f - player.width));
+                    }
+                }
+            }
+        }
+        net.minecraftforge.fml.common.FMLCommonHandler.instance().onPlayerPostTick(player);
+    }
+
+    public static float getEyeHeight(Entity e) {
+//    	System.out.println("I WOrk!");
+    	float originalHeight = e.getEyeHeight();
+    	if(e instanceof EntityLivingBase){
+    		ISizeCapability sizeCapability = e.getCapability(GullivarMod.entitySize, null);
+    		if(sizeCapability != null){
+    			double scale = sizeCapability.getScaleValue();
+    			return (float)(originalHeight * scale);
+    		}
+    	}
+        return originalHeight;
+    }
 
     public static boolean isServerInOnlineMode(){
     	return false;
@@ -621,6 +702,7 @@ public class CallRunner {
 			double newY = entity.posY + dy;
 			double newZ = entity.posZ + dz;
 			BlockPos newPosInBlock = new BlockPos(newX,newY,newZ);
+
 
 			PhysicsWrapperEntity wrapper = ValkyrienWarfareMod.physicsManager.getObjectManagingPos(entity.worldObj, newPosInBlock);
 

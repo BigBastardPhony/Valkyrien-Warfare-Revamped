@@ -160,7 +160,9 @@ public class EventsCommon {
 			EntityPlayerMP p = (EntityPlayerMP) event.player;
 			try{
 				if (!(p.connection instanceof CustomNetHandlerPlayServer)) {
-					p.connection = new CustomNetHandlerPlayServer(p.connection);
+					if(p.connection != null){
+						p.connection = new CustomNetHandlerPlayServer(p.connection);
+					}
 				}else{
 					CustomNetHandlerPlayServer customNetHandler = (CustomNetHandlerPlayServer)p.connection;
 					if(p.interactionManager.getBlockReachDistance() == CustomNetHandlerPlayServer.dummyBlockReachDist && customNetHandler.ticksSinceLastTry == 2){

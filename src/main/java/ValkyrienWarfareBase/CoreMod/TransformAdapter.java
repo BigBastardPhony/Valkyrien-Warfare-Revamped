@@ -68,7 +68,17 @@ public class TransformAdapter extends ClassVisitor {
 	}
 
 	public boolean runTransformer(int opcode, String calledName, String calledDesc, String calledOwner, MethodVisitor mv, boolean itf) {
-
+		
+		if (isMethod(calledDesc, "()V", calledName, EntityPlayerName, "updateSize", "RENAMEME", calledOwner)) {
+			mv.visitMethodInsn(Opcodes.INVOKESTATIC, ValkyrienWarfarePlugin.PathCommon, "updateSize", "(L"+EntityPlayerName+";)V", itf);
+			return false;
+		}
+		
+		if (isMethod(calledDesc, "()F", calledName, EntityClassName, "getEyeHeight", "RENAMEME", calledOwner)) {
+			mv.visitMethodInsn(Opcodes.INVOKESTATIC, ValkyrienWarfarePlugin.PathCommon, "getEyeHeight", "(L"+EntityClassName+";)F", itf);
+			return false;
+		}
+		
 		//TODO: Move to separate mod
 		if (isMethod(calledDesc, "()Z", calledName, MinecraftServerName, "isServerInOnlineMode", "RENAMEME", calledOwner)) {
 			mv.visitInsn(Opcodes.POP);
