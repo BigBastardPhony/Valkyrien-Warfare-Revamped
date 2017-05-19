@@ -9,6 +9,9 @@ tile.dopedetherium.name=Doped Etherium
 potion.effect.embiggening=Potion of Embiggening
 effect.embiggen=When Applied - +1 Embiggen
 
+potion.effect.ensmallening=Potion of Ensmallening
+effect.ensmallen=When Applied - +1 Ensmallen
+
 #ENGINES
 tile.basicEngine.name=Basic Engine
 tile.advancedEngine.name=Advanced Engine
