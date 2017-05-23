@@ -22,9 +22,9 @@ public class BigPotion extends Potion {
     	if(base != null){
     		float NewScale = (float) (sizeCapability.getScaleValue() * 3D);
     		
-    		if(NewScale > 10)
+    		if(NewScale > 15)
     		{
-    			NewScale = 10;
+    			NewScale = 15;
     		}
     		
     		sizeCapability.setScaleValue(NewScale);
