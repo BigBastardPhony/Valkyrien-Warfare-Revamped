@@ -1,9 +1,10 @@
 package Gullivar.Capability;
 
-import java.lang.reflect.Method;
-
+import Gullivar.GullivarMod;
+import Gullivar.Network.EntityScaleMessage;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 
 public class ImplISizeCapability implements ISizeCapability {
 
@@ -64,7 +65,7 @@ public class ImplISizeCapability implements ISizeCapability {
 	}
 
 	@Override
-	public void updateEntityScale(EntityLivingBase toUpdate) {
+	public void updateEntityScaleServer(EntityLivingBase toUpdate) {
 		double newHeight = toUpdate.height * scale;
 		double newEyeHeight = toUpdate.getEyeHeight() * scale;
 		double newWidth = toUpdate.width * scale;
@@ -78,6 +79,11 @@ public class ImplISizeCapability implements ISizeCapability {
         if (toUpdate.width > f && !toUpdate.firstUpdate && !toUpdate.worldObj.isRemote)
         {
 //        	toUpdate.moveEntity((double)(f - toUpdate.width), 0.0D, (double)(f - toUpdate.width));
+        }
+        
+        if(!toUpdate.worldObj.isRemote){
+        	EntityScaleMessage message = new EntityScaleMessage(toUpdate, (float) getScaleValue());
+        	GullivarMod.GulliverSizeNetwork.sendToAllAround(message, new TargetPoint(toUpdate.dimension, toUpdate.posX, toUpdate.posY, toUpdate.posZ, 150D));
         }
 	}
 

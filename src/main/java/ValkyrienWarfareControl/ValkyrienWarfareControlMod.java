@@ -36,11 +36,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionEffect;
-import net.minecraft.potion.PotionType;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -106,13 +102,6 @@ public class ValkyrienWarfareControlMod {
 		proxy.init(event);
 		registerBlocks(event);
 		registerTileEntities(event);
-
-		Potion.REGISTRY.register(28, new ResourceLocation("embiggening"), (new BigPotion()).setIconIndexVisible(6, 3).setPotionName("effect.embiggen").setBeneficial());
-		PotionType.REGISTRY.register(911, new ResourceLocation("embiggening"), new PotionType("embiggening", new PotionEffect[]{new PotionEffect(Potion.REGISTRY.getObject(new ResourceLocation("embiggening")),1,1)}));
-		
-		Potion.REGISTRY.register(29, new ResourceLocation("ensmallening"), (new SmallPotion()).setIconIndexVisible(6 , 3).setPotionName("effect.ensmallen").setBeneficial());
-		PotionType.REGISTRY.register(912, new ResourceLocation("ensmallening"), new PotionType("ensmallening", new PotionEffect[]{new PotionEffect(Potion.REGISTRY.getObject(new ResourceLocation("ensmallening")),1,1)}));
-
 		registerItems(event);
 		registerRecipies(event);
 		registerNetworks(event);
