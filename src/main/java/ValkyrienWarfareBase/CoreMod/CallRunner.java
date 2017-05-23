@@ -321,7 +321,7 @@ public class CallRunner {
 			EntityPolygon playerPoly = new EntityPolygon(base.getEntityBoundingBox(), physWrapper.wrapping.coordTransform.wToLTransform, base);
 			AxisAlignedBB bb = playerPoly.getEnclosedAABB();
 			for (int x = MathHelper.floor_double(bb.minX); x < bb.maxX; x++) {
-				for (int y = MathHelper.floor_double(bb.minY); y < bb.maxY; y++) {
+				for (int y = Math.min(MathHelper.floor_double(bb.minY), 255); y < Math.min(bb.maxY, 255); y++) {
 					for (int z = MathHelper.floor_double(bb.minZ); z < bb.maxZ; z++) {
 						BlockPos pos = new BlockPos(x, y, z);
 						IBlockState checkState = base.worldObj.getBlockState(pos);

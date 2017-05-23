@@ -1,4 +1,4 @@
-package ValkyrienWarfareControl;
+package Gullivar.Potion;
 
 import javax.annotation.Nullable;
 
@@ -20,7 +20,7 @@ public class BigPotion extends Potion {
 		ISizeCapability sizeCapability = base.getCapability(GullivarMod.entitySize, null);
     	if(base != null){
     		sizeCapability.setScaleValue(sizeCapability.getScaleValue() * 3D);
-    		sizeCapability.updateEntityScale(base);
+    		sizeCapability.updateEntityScaleServer(base);
     		System.out.println("SSHEEEEIT: " + sizeCapability.getScaleValue());
     	}
 		//entityLivingBaseIn.storePropety("MakeMeBig")

@@ -2,7 +2,15 @@ package Gullivar;
 
 import Gullivar.Capability.CapabilitiesRegistry;
 import Gullivar.Capability.ISizeCapability;
+import Gullivar.Network.EntityScaleMessage;
+import Gullivar.Network.EntityScaleMessageHandler;
+import Gullivar.Potion.BigPotion;
+import Gullivar.Potion.SmallPotion;
 import Gullivar.Proxy.CommonProxy;
+import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionEffect;
+import net.minecraft.potion.PotionType;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.fml.common.Mod;
@@ -11,6 +19,10 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLStateEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import net.minecraftforge.fml.relauncher.Side;
 
 @Mod(modid = GullivarMod.MODID, name = GullivarMod.MODNAME, version = GullivarMod.MODVER)
 public class GullivarMod {
@@ -25,6 +37,8 @@ public class GullivarMod {
 	@CapabilityInject(ISizeCapability.class)
 	public static final Capability<ISizeCapability> entitySize = null;
 
+	public static SimpleNetworkWrapper GulliverSizeNetwork;
+	
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		for(int i = 0; i < 100; i++){
@@ -37,6 +51,13 @@ public class GullivarMod {
 	@EventHandler
 	public void init(FMLInitializationEvent event) {
 		proxy.init(event);
+		
+		Potion.REGISTRY.register(28, new ResourceLocation("embiggening"), (new BigPotion()).setIconIndexVisible(6, 3).setPotionName("effect.embiggen").setBeneficial());
+		PotionType.REGISTRY.register(911, new ResourceLocation("embiggening"), new PotionType("embiggening", new PotionEffect[]{new PotionEffect(Potion.REGISTRY.getObject(new ResourceLocation("embiggening")),1,1)}));
+		
+		Potion.REGISTRY.register(29, new ResourceLocation("ensmallening"), (new SmallPotion()).setIconIndexVisible(6 , 3).setPotionName("effect.ensmallen").setBeneficial());
+		PotionType.REGISTRY.register(912, new ResourceLocation("ensmallening"), new PotionType("ensmallening", new PotionEffect[]{new PotionEffect(Potion.REGISTRY.getObject(new ResourceLocation("ensmallening")),1,1)}));
+
 	}
 
 	@EventHandler
@@ -44,4 +65,9 @@ public class GullivarMod {
 		proxy.postInit(event);
 	}
 
+	private void registerNetworks(FMLStateEvent event) {
+		GulliverSizeNetwork = NetworkRegistry.INSTANCE.newSimpleChannel("scalechannel");
+		GulliverSizeNetwork.registerMessage(EntityScaleMessageHandler.class, EntityScaleMessage.class, 0, Side.CLIENT);
+	}
+	
 }
