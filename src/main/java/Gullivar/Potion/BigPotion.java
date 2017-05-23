@@ -17,11 +17,19 @@ public class BigPotion extends Potion {
 
 	@Override
 	public void performEffect(EntityLivingBase base, int p_76394_2_) {
+			
 		ISizeCapability sizeCapability = base.getCapability(GullivarMod.entitySize, null);
     	if(base != null){
-    		sizeCapability.setScaleValue(sizeCapability.getScaleValue() * 3D);
+    		float NewScale = (float) (sizeCapability.getScaleValue() * 3D);
+    		
+    		if(NewScale > 10)
+    		{
+    			NewScale = 10;
+    		}
+    		
+    		sizeCapability.setScaleValue(NewScale);
     		sizeCapability.updateEntityScaleServer(base);
-    		System.out.println("SSHEEEEIT: " + sizeCapability.getScaleValue());
+    		
     	}
 		//entityLivingBaseIn.storePropety("MakeMeBig")
 	}
@@ -29,7 +37,6 @@ public class BigPotion extends Potion {
 	@Override
 	public void affectEntity(@Nullable Entity source, @Nullable Entity indirectSource, EntityLivingBase entityLivingBaseIn, int amplifier, double health) {
 		performEffect(entityLivingBaseIn, 1);
-		System.out.println("Shalome");
 	}
 
 	public Potion setIconIndexVisible(int p_76399_1_, int p_76399_2_) {
