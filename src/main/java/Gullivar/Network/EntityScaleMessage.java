@@ -21,18 +21,14 @@ public class EntityScaleMessage implements IMessage {
 	
 	@Override
 	public void fromBytes(ByteBuf buf) {
-		PacketBuffer packetBuf = new PacketBuffer(buf);
-		
-		packetBuf.writeInt(entityID);
-		packetBuf.writeFloat(scale);
+		entityID = buf.readInt();
+		scale = buf.readFloat();
 	}
-
+	
 	@Override
 	public void toBytes(ByteBuf buf) {
-		PacketBuffer packetBuf = new PacketBuffer(buf);
-		
-		entityID = packetBuf.readInt();
-		scale = packetBuf.readFloat();
+		buf.writeInt(entityID);
+		buf.writeFloat(scale);
 	}
 
 }

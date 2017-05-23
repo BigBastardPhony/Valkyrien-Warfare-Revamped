@@ -184,6 +184,12 @@ public class EntityCollisionInjector {
 					//This is too big, something went wrong here
 					break;
 				}
+				
+				if((bb.maxX - bb.minX)*(bb.maxZ - bb.minZ) * (bb.maxY - bb.minY)  > 1000){
+					//This is too big, something went wrong here GULLIVAR
+					break;
+				}
+				
 				List<AxisAlignedBB> collidingBBs = entity.worldObj.getCollisionBoxes(bb);
 
 				// TODO: Fix the performance of this!

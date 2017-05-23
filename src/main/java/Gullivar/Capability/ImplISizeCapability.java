@@ -2,7 +2,9 @@ package Gullivar.Capability;
 
 import Gullivar.GullivarMod;
 import Gullivar.Network.EntityScaleMessage;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 
@@ -70,6 +72,12 @@ public class ImplISizeCapability implements ISizeCapability {
 		double newEyeHeight = toUpdate.getEyeHeight() * scale;
 		double newWidth = toUpdate.width * scale;
 
+		if(toUpdate instanceof EntityPlayer){
+			EntityPlayer player = (EntityPlayer)toUpdate;
+			
+			Minecraft.getMinecraft().playerController.getBlockReachDistance();
+		}
+		
 		float f = toUpdate.width;
 		toUpdate.width = (float) newWidth;
 		toUpdate.height = (float) newHeight;
@@ -84,6 +92,7 @@ public class ImplISizeCapability implements ISizeCapability {
         if(!toUpdate.worldObj.isRemote){
         	EntityScaleMessage message = new EntityScaleMessage(toUpdate, (float) getScaleValue());
         	GullivarMod.GulliverSizeNetwork.sendToAllAround(message, new TargetPoint(toUpdate.dimension, toUpdate.posX, toUpdate.posY, toUpdate.posZ, 150D));
+        	
         }
 	}
 
