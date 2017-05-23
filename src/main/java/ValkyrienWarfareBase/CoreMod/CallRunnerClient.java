@@ -26,6 +26,7 @@ import net.minecraft.block.BlockSkull;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.client.renderer.ActiveRenderInfo;
@@ -44,7 +45,6 @@ import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.monster.EntitySlime;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
@@ -68,6 +68,20 @@ public class CallRunnerClient extends CallRunner {
 			drawingBatchName = TileEntityRendererDispatcher.class.getDeclaredField("drawingBatch");
 			drawingBatchName.setAccessible(true);
 		} catch (Exception e) {}
+	}
+	
+	public static float getBlockReachDistance(PlayerControllerMP input){
+		float toReturn = input.getBlockReachDistance();
+		
+		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+		
+		if(player != null){
+			ISizeCapability sizeCapability = player.getCapability(GullivarMod.entitySize, null);
+			
+			return (float) (toReturn * sizeCapability.getScaleValue());
+		}
+		
+		return toReturn;
 	}
 
     public static void prepareScale(EntityLivingBase base)

@@ -40,6 +40,7 @@ public class ValkyrienWarfareTransformer implements IClassTransformer {
 //				.node(SpecificMethodNodeTransformer.instructionsInserterBeforeReturn(ValkyrienWarfarePlugin.isObfuscatedEnvironment ? "func_145835_a" : "getDistanceSq", 0, () -> new InsnListBuilder(new VarInsnNode(ALOAD, 0), new VarInsnNode(DLOAD, 1), new VarInsnNode(DLOAD, 3), new VarInsnNode(DLOAD, 5), new MethodInsnNode(INVOKESTATIC, ValkyrienWarfarePlugin.PathCommon, "getDistanceSq", "(DLnet/minecraft/tileentity/TileEntity;DDD)D", false)).build()))
 //				.node(SpecificMethodNodeTransformer.instructionsInserterBeforeReturn(ValkyrienWarfarePlugin.isObfuscatedEnvironment ? "func_184177_bl" : "getRenderBoundingBox", 0, () -> new InsnListBuilder(new VarInsnNode(ALOAD, 0), new MethodInsnNode(INVOKESTATIC, ValkyrienWarfarePlugin.PathClient, "getRenderBoundingBox", "(Lnet/minecraft/tileentity/TileEntity;)Lnet/minecraft/util/math/AxisAlignedBB;", false)).build()))
 				.build(),
+				
 				new SpecificClassNodeChildrenTransformer.Builder("net/minecraft/client/renderer/entity/RenderLivingBase", 0)
 				.node(SpecificMethodNodeTransformer.instructionsBeginningInserter("prepareScale", 0, 
 						

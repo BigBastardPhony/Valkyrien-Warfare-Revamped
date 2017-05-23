@@ -53,6 +53,7 @@ public class TransformAdapter extends ClassVisitor {
 	public static final String ForgeChunkManagerName = "net/minecraftforge/common/ForgeChunkManager";
 	public static final String MinecraftServerName = "net/minecraft/server/MinecraftServer";
 	public static final String HttpUtilName = "net/minecraft/util/HttpUtil";
+	public static final String PlayerControllerMPName = "net/minecraft/client/multiplayer/PlayerControllerMP";
 
 	public static final String PredicateName = "com/google/common/base/Predicate";
 	public static final String ListName = "java/util/List";
@@ -68,6 +69,11 @@ public class TransformAdapter extends ClassVisitor {
 	}
 
 	public boolean runTransformer(int opcode, String calledName, String calledDesc, String calledOwner, MethodVisitor mv, boolean itf) {
+		
+		if (isMethod(calledDesc, "()F", calledName, PlayerControllerMPName, "getBlockReachDistance", "RENAMEME", calledOwner)) {
+			mv.visitMethodInsn(Opcodes.INVOKESTATIC, ValkyrienWarfarePlugin.PathClient, "getBlockReachDistance", "(L"+PlayerControllerMPName+";)F", itf);
+			return false;
+		}
 		
 		if (isMethod(calledDesc, "()V", calledName, EntityPlayerName, "updateSize", "RENAMEME", calledOwner)) {
 			mv.visitMethodInsn(Opcodes.INVOKESTATIC, ValkyrienWarfarePlugin.PathCommon, "updateSize", "(L"+EntityPlayerName+";)V", itf);

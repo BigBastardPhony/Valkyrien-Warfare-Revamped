@@ -45,6 +45,7 @@ public class GullivarMod {
 //			System.out.println("OBAMA!");
 		}
 		CapabilitiesRegistry.registerCapabilities();
+		registerNetworks(event);
 		proxy.preInit(event);
 	}
 
@@ -58,6 +59,7 @@ public class GullivarMod {
 		Potion.REGISTRY.register(29, new ResourceLocation("ensmallening"), (new SmallPotion()).setIconIndexVisible(6 , 3).setPotionName("effect.ensmallen").setBeneficial());
 		PotionType.REGISTRY.register(912, new ResourceLocation("ensmallening"), new PotionType("ensmallening", new PotionEffect[]{new PotionEffect(Potion.REGISTRY.getObject(new ResourceLocation("ensmallening")),1,1)}));
 
+
 	}
 
 	@EventHandler
@@ -66,7 +68,7 @@ public class GullivarMod {
 	}
 
 	private void registerNetworks(FMLStateEvent event) {
-		GulliverSizeNetwork = NetworkRegistry.INSTANCE.newSimpleChannel("scalechannel");
+		GulliverSizeNetwork = NetworkRegistry.INSTANCE.newSimpleChannel("scalech");
 		GulliverSizeNetwork.registerMessage(EntityScaleMessageHandler.class, EntityScaleMessage.class, 0, Side.CLIENT);
 	}
 	
