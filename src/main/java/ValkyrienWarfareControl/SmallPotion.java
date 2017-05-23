@@ -16,7 +16,13 @@ public class SmallPotion extends Potion {
 	public void performEffect(EntityLivingBase base, int p_76394_2_) {
 		ISizeCapability sizeCapability = base.getCapability(GullivarMod.entitySize, null);
 	    if(base != null){
-	    	sizeCapability.setScaleValue(sizeCapability.getScaleValue() * .3D);
+	    	float NewScale = (float) (sizeCapability.getScaleValue() * .3D);
+	    	
+	    	if(NewScale < .2)
+	    	{
+	    		NewScale = (float) .2;
+	    	}
+	    	sizeCapability.setScaleValue(NewScale);
 	    	sizeCapability.updateEntityScaleServer(base);
 	    }
 			//entityLivingBaseIn.storePropety("MakeMeBig")
