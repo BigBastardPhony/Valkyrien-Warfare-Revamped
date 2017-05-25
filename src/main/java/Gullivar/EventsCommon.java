@@ -11,10 +11,11 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerRespawnEvent;
 
 public class EventsCommon {
 
@@ -61,20 +62,22 @@ public class EventsCommon {
 			}
 		}
 	}
+	
+	@SubscribeEvent(priority = EventPriority.HIGHEST)
+	public void onPlayerLoginEvent(PlayerLoggedInEvent event) {
+		ISizeCapability sizeCapability = event.player.getCapability(GullivarMod.entitySize, null);
+		if(sizeCapability != null){
+			EntityScaleMessage message = new EntityScaleMessage(event.player, (float) sizeCapability.getScaleValue());
+			GullivarMod.GulliverSizeNetwork.sendTo(message, (EntityPlayerMP) event.player);
+		}
+	}
 
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
-	public void onEntityJoinWorldEvent(EntityJoinWorldEvent event) {
-		Entity added = event.getEntity();
-		if(!added.worldObj.isRemote){
-			if(added instanceof EntityPlayerMP){
-				EntityPlayerMP player = (EntityPlayerMP) added;
-				
-				ISizeCapability sizeCapability = player.getCapability(GullivarMod.entitySize, null);
-				if(sizeCapability != null){
-					EntityScaleMessage message = new EntityScaleMessage(player, (float) sizeCapability.getScaleValue());
-					GullivarMod.GulliverSizeNetwork.sendTo(message, player);
-				}
-			}
+	public void onPlayerRespawnEvent(PlayerRespawnEvent event) {
+		ISizeCapability sizeCapability = event.player.getCapability(GullivarMod.entitySize, null);
+		if(sizeCapability != null){
+			EntityScaleMessage message = new EntityScaleMessage(event.player, (float) sizeCapability.getScaleValue());
+			GullivarMod.GulliverSizeNetwork.sendTo(message, (EntityPlayerMP) event.player);
 		}
 	}
 
