@@ -53,6 +53,13 @@ public class ValkyrienWarfareTransformer implements IClassTransformer {
 				
 				
 				.build(),
+				
+				new SpecificClassNodeChildrenTransformer.Builder("net/minecraft/entity/EntityLivingBase", 0)
+				
+				.node(SpecificMethodNodeTransformer.instructionsInserterBeforeReturn(ValkyrienWarfarePlugin.isObfuscatedEnvironment ? "RENAMEME()F" : "getJumpUpwardsMotion()F", 0, () -> new InsnListBuilder(new VarInsnNode(ALOAD, 0),new MethodInsnNode(INVOKESTATIC, ValkyrienWarfarePlugin.PathCommon, "onGetJumpUpwardsMotion", "(FLnet/minecraft/entity/EntityLivingBase;)F", false)).build()))
+				
+				.build(),
+				
 				new SpecificClassNodeChildrenTransformer.Builder("net/minecraft/entity/Entity", 0)
 				.node(SpecificClassNodeTransformer.setParent("net/minecraft/entity/Entity", 10, old -> "ValkyrienWarfareBase/Interaction/EntityDraggable"))
 				.node(SpecificMethodNodeTransformer.instructionsNodesTransformer("<init>", 5, node -> node.getOpcode() == INVOKESPECIAL && ((MethodInsnNode) node).owner.equals("java/lang/Object") && ((MethodInsnNode) node).name.equals("<init>") ? new MethodInsnNode(INVOKESPECIAL, "ValkyrienWarfareBase/Interaction/EntityDraggable", "<init>", "()V", false) : node))

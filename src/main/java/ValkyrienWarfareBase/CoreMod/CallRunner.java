@@ -1,6 +1,5 @@
 package ValkyrienWarfareBase.CoreMod;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -29,7 +28,6 @@ import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.monster.EntitySlime;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayer.SleepResult;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -57,6 +55,17 @@ import net.minecraftforge.common.DimensionManager;
 
 public class CallRunner {
 
+	public static float onGetJumpUpwardsMotion(float original, EntityLivingBase livingbase)
+    {
+		ISizeCapability sizeCapability = livingbase.getCapability(GullivarMod.entitySize, null);
+		if(sizeCapability != null){
+			double scale = sizeCapability.getScaleValue();
+			
+			return (float) (original * Math.max(1D, Math.pow(scale, 1D/2D)));
+		}
+        return original;
+    }
+	
     public static void updateSize(EntityPlayer player){
     	if(true){
 //    		return;

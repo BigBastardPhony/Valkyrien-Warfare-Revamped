@@ -71,17 +71,22 @@ public class CallRunnerClient extends CallRunner {
 	}
 	
 	public static float getBlockReachDistance(PlayerControllerMP input){
-		float toReturn = input.getBlockReachDistance();
-		
-		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
-		
-		if(player != null){
-			ISizeCapability sizeCapability = player.getCapability(GullivarMod.entitySize, null);
+		try{
+			float toReturn = input.getBlockReachDistance();
 			
-			return (float) (toReturn * Math.pow(sizeCapability.getScaleValue(), 1D/3D));
+			EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+			
+			if(player != null){
+				ISizeCapability sizeCapability = player.getCapability(GullivarMod.entitySize, null);
+				
+				return (float) (toReturn * Math.pow(sizeCapability.getScaleValue(), 1D/3D));
+			}
+			
+			return toReturn;
+		}catch(Exception e){
+			e.printStackTrace();
+			return 0;
 		}
-		
-		return toReturn;
 	}
 
     public static void prepareScale(EntityLivingBase base)
