@@ -69,6 +69,7 @@ public class EventsCommon {
 		if(sizeCapability != null){
 			EntityScaleMessage message = new EntityScaleMessage(event.player, (float) sizeCapability.getScaleValue());
 			GullivarMod.GulliverSizeNetwork.sendTo(message, (EntityPlayerMP) event.player);
+			sizeCapability.updateEntityScaleServer(event.player, false);
 		}
 	}
 
@@ -78,6 +79,7 @@ public class EventsCommon {
 		if(sizeCapability != null){
 			EntityScaleMessage message = new EntityScaleMessage(event.player, (float) sizeCapability.getScaleValue());
 			GullivarMod.GulliverSizeNetwork.sendTo(message, (EntityPlayerMP) event.player);
+			sizeCapability.updateEntityScaleServer(event.player, false);
 		}
 	}
 

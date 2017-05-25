@@ -22,6 +22,6 @@ public interface ISizeCapability {
 
 	public int loadEntityDefaultsIfNone(EntityLivingBase toLoad);
 
-	public void updateEntityScaleServer(EntityLivingBase toUpdate);
+	public void updateEntityScaleServer(EntityLivingBase toUpdate, boolean sendUpdate);
 
 }

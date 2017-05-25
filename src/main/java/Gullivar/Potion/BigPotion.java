@@ -28,7 +28,7 @@ public class BigPotion extends Potion {
     		}
     		
     		sizeCapability.setScaleValue(NewScale);
-    		sizeCapability.updateEntityScaleServer(base);
+    		sizeCapability.updateEntityScaleServer(base, true);
     		
     	}
 		//entityLivingBaseIn.storePropety("MakeMeBig")
