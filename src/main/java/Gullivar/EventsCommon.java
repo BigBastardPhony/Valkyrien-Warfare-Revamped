@@ -1,15 +1,19 @@
 package Gullivar;
 
 import Gullivar.Capability.ISizeCapability;
-import net.minecraft.entity.EntityLiving;
+import Gullivar.Network.EntityScaleMessage;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagByteArray;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class EventsCommon {
@@ -43,6 +47,19 @@ public class EventsCommon {
 			});
 			if(evt.getObject() instanceof EntityPlayer){
 				System.out.println("SHIT!");
+			}
+		}
+	}
+	
+	@SubscribeEvent(priority = EventPriority.HIGHEST)
+		if (!event.getEntityPlayer().worldObj.isRemote) {
+			Entity entity = event.getTarget();
+			if(entity instanceof EntityLivingBase){
+				ISizeCapability sizeCapability = entity.getCapability(GullivarMod.entitySize, null);
+				if(sizeCapability != null){
+					EntityScaleMessage message = new EntityScaleMessage(entity, (float) sizeCapability.getScaleValue());
+					GullivarMod.GulliverSizeNetwork.sendTo(message, (EntityPlayerMP) event.getEntityPlayer());
+				}
 			}
 		}
 	}
