@@ -18,7 +18,6 @@ public class SmallPotion extends Potion {
 	    if(base != null){
 	    	sizeCapability.setScaleValue(sizeCapability.getScaleValue() * 1D/3D);
 	    	sizeCapability.updateEntityScaleServer(base, true);
-	    	System.out.println("SSHEEEEIT: " + sizeCapability.getScaleValue());
 	    }
 			//entityLivingBaseIn.storePropety("MakeMeBig")
 	 }
