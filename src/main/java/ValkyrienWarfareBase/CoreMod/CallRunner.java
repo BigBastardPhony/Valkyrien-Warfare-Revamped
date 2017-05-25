@@ -53,6 +53,17 @@ import net.minecraftforge.common.DimensionManager;
 
 public class CallRunner {
 
+	public static float onGetJumpUpwardsMotion(float original, EntityLivingBase livingbase)
+    {
+		ISizeCapability sizeCapability = livingbase.getCapability(GullivarMod.entitySize, null);
+		if(sizeCapability != null){
+			double scale = sizeCapability.getScaleValue();
+			
+			return (float) (original * Math.max(1D, Math.pow(scale, 1D/2D)));
+		}
+        return original;
+    }
+	
     public static void updateSize(EntityPlayer player){
     	if(true){
 //    		return;
