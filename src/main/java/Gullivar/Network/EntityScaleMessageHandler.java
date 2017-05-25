@@ -29,7 +29,7 @@ public class EntityScaleMessageHandler implements IMessageHandler<EntityScaleMes
 					ISizeCapability sizeCapability = ent.getCapability(GullivarMod.entitySize, null);
 			    	if(sizeCapability != null){
 			    		sizeCapability.setScaleValue(message.scale);
-			    		sizeCapability.updateEntityScaleServer((EntityLivingBase) ent);
+			    		sizeCapability.updateEntityScaleServer((EntityLivingBase) ent, true);
 			    	}else{
 			    		System.err.println("WHAT THE FUCK JUST HAPPENED HERE!!!");
 			    	}

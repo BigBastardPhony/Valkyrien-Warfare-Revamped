@@ -67,7 +67,7 @@ public class ImplISizeCapability implements ISizeCapability {
 	}
 
 	@Override
-	public void updateEntityScaleServer(EntityLivingBase toUpdate) {
+	public void updateEntityScaleServer(EntityLivingBase toUpdate, boolean sendUpdate) {
 		double newHeight = toUpdate.height * scale;
 		double newEyeHeight = toUpdate.getEyeHeight() * scale;
 		double newWidth = toUpdate.width * scale;
@@ -89,7 +89,7 @@ public class ImplISizeCapability implements ISizeCapability {
 //        	toUpdate.moveEntity((double)(f - toUpdate.width), 0.0D, (double)(f - toUpdate.width));
         }
         
-        if(!toUpdate.worldObj.isRemote){
+        if(!toUpdate.worldObj.isRemote && sendUpdate){
         	EntityScaleMessage message = new EntityScaleMessage(toUpdate, (float) getScaleValue());
         	GullivarMod.GulliverSizeNetwork.sendToAllAround(message, new TargetPoint(toUpdate.dimension, toUpdate.posX, toUpdate.posY, toUpdate.posZ, 150D));
         	

@@ -23,7 +23,7 @@ public class SmallPotion extends Potion {
 	    		NewScale = (float) .2;
 	    	}
 	    	sizeCapability.setScaleValue(NewScale);
-	    	sizeCapability.updateEntityScaleServer(base);
+	    	sizeCapability.updateEntityScaleServer(base, true);
 	    }
 			//entityLivingBaseIn.storePropety("MakeMeBig")
 	 }
