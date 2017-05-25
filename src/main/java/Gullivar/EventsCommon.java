@@ -52,6 +52,7 @@ public class EventsCommon {
 	}
 	
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
+	public void onEntityTrack(PlayerEvent.StartTracking event) {
 		if (!event.getEntityPlayer().worldObj.isRemote) {
 			Entity entity = event.getTarget();
 			if(entity instanceof EntityLivingBase){
