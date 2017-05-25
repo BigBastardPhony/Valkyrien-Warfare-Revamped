@@ -78,7 +78,7 @@ public class CallRunnerClient extends CallRunner {
 		if(player != null){
 			ISizeCapability sizeCapability = player.getCapability(GullivarMod.entitySize, null);
 			
-			return (float) (toReturn * Math.max(sizeCapability.getScaleValue(), 1D));
+			return (float) (toReturn * Math.pow(sizeCapability.getScaleValue(), 1D/3D));
 		}
 		
 		return toReturn;
