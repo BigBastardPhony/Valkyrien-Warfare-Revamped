@@ -69,19 +69,19 @@ public class CallRunnerClient extends CallRunner {
 			drawingBatchName.setAccessible(true);
 		} catch (Exception e) {}
 	}
-	
+
 	public static float getBlockReachDistance(PlayerControllerMP input){
 		try{
 			float toReturn = input.getBlockReachDistance();
-			
+
 			EntityPlayer player = Minecraft.getMinecraft().thePlayer;
-			
+
 			if(player != null){
 				ISizeCapability sizeCapability = player.getCapability(GullivarMod.entitySize, null);
-				
+
 				return (float) (toReturn * Math.pow(sizeCapability.getScaleValue(), 1D/3D));
 			}
-			
+
 			return toReturn;
 		}catch(Exception e){
 			e.printStackTrace();
@@ -156,9 +156,17 @@ public class CallRunnerClient extends CallRunner {
 		}
 
 		Vector eyeVector = new Vector(0, CallRunner.getEyeHeight(entity), 0);
-		
+
 		if (entity instanceof EntityLivingBase && ((EntityLivingBase)entity).isPlayerSleeping()){
-			eyeVector.Y += .7D;
+			double bedOffset = .7D;
+			if(entity != null){
+				ISizeCapability sizeCapability = entity.getCapability(GullivarMod.entitySize, null);
+
+				double scale = sizeCapability.getScaleValue();
+
+				bedOffset *= scale;
+			}
+			eyeVector.Y += bedOffset;
         }
 
 		double d0 = entity.prevPosX + (entity.posX - entity.prevPosX) * (double)partialTicks;
@@ -196,8 +204,6 @@ public class CallRunnerClient extends CallRunner {
         d0 += eyeVector.X;
         d1 += eyeVector.Y;
         d2 += eyeVector.Z;
-
-
 
         if (entity instanceof EntityLivingBase && ((EntityLivingBase)entity).isPlayerSleeping())
         {
@@ -303,7 +309,18 @@ public class CallRunnerClient extends CallRunner {
         }
         else
         {
-            GlStateManager.translate(0.0F, 0.0F, 0.05F);
+//        	System.out.println("test");
+        	float headSizeOffset = 0.05F;
+
+        	if(entity != null){
+				ISizeCapability sizeCapability = entity.getCapability(GullivarMod.entitySize, null);
+
+				double scale = sizeCapability.getScaleValue();
+
+				headSizeOffset *= scale;
+			}
+
+            GlStateManager.translate(0.0F, 0.0F, headSizeOffset);
         }
 
         if (!renderer.mc.gameSettings.debugCamEnable)
