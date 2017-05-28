@@ -58,12 +58,12 @@ public class CallRunner {
 		ISizeCapability sizeCapability = livingbase.getCapability(GullivarMod.entitySize, null);
 		if(sizeCapability != null){
 			double scale = sizeCapability.getScaleValue();
-			
+
 			return (float) (original * Math.max(1D, Math.pow(scale, 1D/2D)));
 		}
         return original;
     }
-	
+
     public static void updateSize(EntityPlayer player){
     	if(true){
 //    		return;
@@ -103,8 +103,6 @@ public class CallRunner {
             {
             	float width = f;
             	float height = f1;
-
-
             	if (width != player.width || height != player.height)
                 {
 
@@ -113,7 +111,6 @@ public class CallRunner {
             		if(sizeCapability != null){
             			scale = (float) sizeCapability.getScaleValue();
                 	}
-
                     f = player.width;
                     player.width = width * scale;
                     player.height = height * scale;
@@ -141,10 +138,6 @@ public class CallRunner {
     		}
     	}
         return originalHeight;
-    }
-
-    public static boolean isServerInOnlineMode(){
-    	return false;
     }
 
 	/**
@@ -713,7 +706,6 @@ public class CallRunner {
 			double newY = entity.posY + dy;
 			double newZ = entity.posZ + dz;
 			BlockPos newPosInBlock = new BlockPos(newX,newY,newZ);
-
 
 			PhysicsWrapperEntity wrapper = ValkyrienWarfareMod.physicsManager.getObjectManagingPos(entity.worldObj, newPosInBlock);
 
