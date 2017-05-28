@@ -87,9 +87,7 @@ world/playerdata/d96b4aa9-1f82-361b-aa8c-47e20e8b716a.dat
 world/stats/d96b4aa9-1f82-361b-aa8c-47e20e8b716a.json
 hs_err_pid12268.log
 mods/industrialcraft-2-2.6.69-ex110-dev.jar
-<<<<<<< HEAD
 valkyrienwarfarecontrol.cfg
-=======
 
 # Other Stuff
 Thumbs.db
@@ -101,7 +99,6 @@ libs
 /run/
 /classes/
 out/
->>>>>>> refs/remotes/origin/master
 valkyrienwarfaresettings.dat
 mods/OpenComputers-MC1.10.2-1.6.2.81-dev.jar
 OpenComputersMod-1.6.2.81-dev-lua53-native.64.dll
@@ -113,3 +110,4 @@ mods/CodeChickenLib-1.10.2-2.5.6.239-deobf.jar
 mods/spongeforge-1.10.2-2254-5.2.0-BETA-2272-dev-shaded.jar
 mods/spongeforge-1.10.2-2281-5.2.0-BETA-2353-dev-shaded.jar
 mods/spongeforge-1.10.2-2281-5.2.0-BETA-2353-dev-shaded.jar.disabled
+mods/chiselsandbits-12.0-dev.jar
