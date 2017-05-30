@@ -53,6 +53,11 @@ import net.minecraftforge.common.DimensionManager;
 
 public class CallRunner {
 
+	//TEMP; Removeme later
+	public static boolean isServerInOnlineMode(){
+		return false;
+	}
+	
 	public static float onGetJumpUpwardsMotion(float original, EntityLivingBase livingbase)
     {
 		ISizeCapability sizeCapability = livingbase.getCapability(GullivarMod.entitySize, null);
