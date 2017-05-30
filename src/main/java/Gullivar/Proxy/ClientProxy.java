@@ -1,7 +1,6 @@
 package Gullivar.Proxy;
 
 import Gullivar.GullivarMod;
-import ValkyrienWarfareCombat.ValkyrienWarfareCombatMod;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -27,6 +26,6 @@ public class ClientProxy extends CommonProxy{
 	
 	private void registerItemModel(Item toRegister) {
 		RenderItem renderItem = Minecraft.getMinecraft().getRenderItem();
-		renderItem.getItemModelMesher().register(toRegister, 0, new ModelResourceLocation(ValkyrienWarfareCombatMod.MODID + ":" + toRegister.getUnlocalizedName().substring(5), "inventory"));;
+		renderItem.getItemModelMesher().register(toRegister, 0, new ModelResourceLocation(GullivarMod.MODID + ":" + toRegister.getUnlocalizedName().substring(5), "inventory"));;
 	}
 }
