@@ -43,8 +43,8 @@ public class ShipSpawnDetector extends SpatialDetector {
 	public boolean isValidExpansion(int x, int y, int z) {
 		IBlockState state = cache.getBlockState(x, y, z);
 		if (state.getBlock() == Blocks.BEDROCK) {
-			cleanHouse = true;
-			return false;
+//			cleanHouse = true;
+//			return false;
 		}
 		return !blackList.contains(state.getBlock());
 		// if(state.getBlock()==Blocks.BEDROCK){

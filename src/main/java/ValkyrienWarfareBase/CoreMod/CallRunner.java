@@ -54,12 +54,11 @@ import net.minecraftforge.common.DimensionManager;
 public class CallRunner {
 
 	//TEMP; Removeme later
-	public static boolean isServerInOnlineMode(){
+	public static boolean isServerInOnlineMode() {
 		return false;
 	}
 	
-	public static float onGetJumpUpwardsMotion(float original, EntityLivingBase livingbase)
-    {
+	public static float onGetJumpUpwardsMotion(float original, EntityLivingBase livingbase) {
 		ISizeCapability sizeCapability = livingbase.getCapability(GullivarMod.entitySize, null);
 		if(sizeCapability != null){
 			double scale = sizeCapability.getScaleValue();
@@ -69,7 +68,7 @@ public class CallRunner {
         return original;
     }
 
-    public static void updateSize(EntityPlayer player){
+    public static void updateSize(EntityPlayer player) {
     	if(true){
 //    		return;
     	}
