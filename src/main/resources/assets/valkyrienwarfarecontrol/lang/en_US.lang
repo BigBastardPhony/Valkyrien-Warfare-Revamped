@@ -7,6 +7,8 @@ tile.shippilotschair.name=Piloting Chair
 tile.shippassengerchair.name=Passenger Chair
 tile.dopedetherium.name=Doped Etherium
 tile.balloonburner.name=Balloon Burner
+tile.thrustrelay.name=Thrust Relay
+tile.thrustmodulator.name=Thrust Modulator
 
 potion.effect.embiggening=Potion of Embiggening
 effect.embiggen=When Applied - +1 Embiggen
