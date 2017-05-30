@@ -7,6 +7,8 @@ import Gullivar.Network.EntityScaleMessageHandler;
 import Gullivar.Potion.BigPotion;
 import Gullivar.Potion.SmallPotion;
 import Gullivar.Proxy.CommonProxy;
+import ValkyrienWarfareBase.ValkyrienWarfareMod;
+import net.minecraft.item.Item;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.potion.PotionType;
@@ -15,6 +17,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -27,10 +30,13 @@ import net.minecraftforge.fml.relauncher.Side;
 @Mod(modid = GullivarMod.MODID, name = GullivarMod.MODNAME, version = GullivarMod.MODVER)
 public class GullivarMod {
 
-	public static final String MODID = "gullivarmod";
+	public static final String MODID = "gullivar";
 	public static final String MODNAME = "Gullivar Mod";
 	public static final String MODVER = "1.0";
 
+	@Instance(MODID)
+	public static GullivarMod instance = new GullivarMod();
+	
 	@SidedProxy(clientSide = "Gullivar.Proxy.ClientProxy", serverSide = "Gullivar.Proxy.CommonProxy")
 	public static CommonProxy proxy;
 
@@ -39,6 +45,8 @@ public class GullivarMod {
 
 	public static SimpleNetworkWrapper GulliverSizeNetwork;
 	
+	public Item boxingGloves;
+	
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		for(int i = 0; i < 100; i++){
@@ -46,6 +54,7 @@ public class GullivarMod {
 		}
 		CapabilitiesRegistry.registerCapabilities();
 		registerNetworks(event);
+		GulliverItems.registerItems(instance);
 		proxy.preInit(event);
 	}
 
